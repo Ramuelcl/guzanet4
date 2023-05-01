@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+//
+use App\Http\Controllers\PrincipalController;
+use App\Http\Controllers\backend\UserController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,6 +18,32 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::controller(PrincipalController::class)
+    ->prefix('')
+    ->as('')
+    ->group(function () {
+        route::get('/', 'home')->name('home');
+        route::get('/porDefinir', 'porDefinir')->name('porDefinir');
+        route::get('/acercade', 'acercade')->name('acercade');
+        route::get('/contacto', 'contacto')->name('contacto');
+        route::post('/contacto', 'contacto')->name('contacto.enviar');
+        Route::get('/linkstorage', function () {
+            $targetFolder = base_path() . '/storage/app/public';
+            $linkFolder = $_SERVER['DOCUMENT_ROOT'] . '/storage';
+            dump($targetFolder, $linkFolder);
+        });
+    });
+
+// Route::group(['middleware' => 'auth:sanctum'], function () {
+// });
+Route::get('user/list', [UserController::class, 'index'])->name('user.list');
+
+// Route::group(['middleware' => ['auth']], function () {
+//     Route::get('users', function () {
+//         return view('backend.users.index');
+//     })->name('users');
+// });
 
 Route::middleware([
     'auth:sanctum',

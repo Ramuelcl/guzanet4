@@ -1,0 +1,83 @@
+models:
+
+  backend\Tabla:
+    id: false
+    tabla: bigInteger
+    tabla_id: bigInteger
+    nombre: string:45 charset:'utf8'
+    descripcion: string:128 nullable default:null charset:'utf8'
+    activo: boolean nullable default:true
+    valor1: decimal:8,2 nullable default:null
+    valor2: string:128 nullable default:null
+    valor3: boolean nullable default:false
+    indexes:
+      - primary: tabla, tabla_id
+      - index: tabla, nombre
+    softDeletes: true
+
+  backend\Categoria:
+    nombre: string:45 nullable default:null unique
+    babosa: string:45 nullable default:null charset:'utf8'
+    softDeletes: true
+    relationships:
+      morphedByMany: Post, Video, Imagen
+
+  backend\Perfil:
+    id: false
+    user_id: id foreign:users.id primary
+    edad: unsignedTinyInteger
+    profesion: string:3 nullable default:null comment:"despues cambiar a tabla" charset:'utf8'
+    biografia: longtext default:null charset:'utf8'
+    website: string:128 default:null charset:'utf8'
+    softDeletes: true
+    relationships:
+      hasOne: User
+
+  backend\UserSetting:
+    id: false
+    user_id: id foreign:users.id
+    theme: string:20 default:'dark' charset:'utf8'
+    language: string:5 default:'fr-FR' charset:'utf8'
+    autologin: boolean default:true
+    ipVisitor: string:45 nullable default:null charset:'utf8'
+    options: json nullable default:null
+    device: string:17 nullable default:null charset:'utf8'
+    softDeletes: true
+    relationships:
+      hasOne: User
+
+  backend\Marcador:
+    nombre: string:45 nullable default:null unique charset:'utf8'
+    babosa: string:45 nullable default:null charset:'utf8'
+    hexa: string:7 unique default:'#' charset:'utf8'
+    rgb: string:20 nullable default:null charset:'utf8'
+    metadata: json nullable
+    softDeletes: true
+    relationships:
+      morphedByMany: Post:postIndex, Video:videoIndex, Imagen:imagenIndex
+
+  posts\Post:
+    user_id: id foreign:users.id
+    name: string:32 charset:'utf8'
+    contenido: longtext nullable charset:'utf8'
+    publicado: timestamp nullable useCurrent
+    actualizado: timestamp nullable useCurrent useCurrentOnUpdate
+    softDeletes: true
+    relationships:
+      morphToMany: Marcador, Categoria
+
+  posts\Video:
+    name: string:32 charset:'utf8'
+    user_id: id foreign:users.id
+    url: string:128 charset:'utf8'
+    softDeletes: true
+    relationships:
+      morphToMany: Marcador, Categoria
+
+  posts\Imagen:
+    name: string:32 charset:'utf8'
+    user_id: id foreign:users.id
+    url: string:128 charset:'utf8'
+    softDeletes: true
+    relationships:
+      morphToMany: Marcador, Categoria

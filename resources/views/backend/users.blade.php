@@ -1,4 +1,4 @@
-{{-- resources/views/welcome.blade.php --}}
+{{-- resources/views/backend/users.blade.php --}}
 <x-app-layout>
     <x-slot name="header">
         <div class="flex">

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // agregar un campo
             $table->boolean('is_active')->default(true)->after('profile_photo_path');
+            $table->string('role', 20)->default(null)->after('profile_photo_path');
             // modificar campos
             // * para alterar campos hay que ejecutar antes
             // * composer require doctrine/dbal
