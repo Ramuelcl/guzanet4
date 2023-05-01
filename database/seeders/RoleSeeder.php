@@ -11,7 +11,8 @@ class RoleSeeder extends Seeder
 {
     // tabla roles
     protected $roles = [
-        // tabla roles
+        'client',
+        'seller',
         'user',
         'guest',
         'writer',
@@ -19,6 +20,7 @@ class RoleSeeder extends Seeder
         'moderator',
         'admin',
         'super-admin',
+        // sistemas
         'Blog',
         'Banca',
         'HoraTrabajo',
@@ -48,16 +50,18 @@ class RoleSeeder extends Seeder
      */
     public function run()
     {
-
-        // create permissions
-        $perm = array_merge($this->permissions2, $this->permissions3);
-        // Permission::create(['name' => 'access']);
-
+        // crea todos los roles
         foreach ($this->roles as $rol) {
-            $existe = false;
-            foreach ($perm as $p) {
-                if ($rol == 'client' || $rol == 'seller' || $rol == 'user') {
-                    $name = $rol . ' ' . $p;
+            Role::create(['name' => $rol]);
+        }
+        // crea los permisos
+        $permission = array_merge($this->permissions1, $this->permissions2, $this->permissions3);
+        foreach (Role::all() as $key => $rol) {
+            // dump($rol);
+            foreach ($permission as $p) {
+                $existe = false;
+                if ($rol->name == 'client' || $rol->name == 'seller' || $rol->name == 'user') {
+                    $name = $rol->name . ' ' . $p;
                 } else {
                     $name = $p;
                 }
@@ -70,28 +74,21 @@ class RoleSeeder extends Seeder
             }
         }
 
-        // create roles and assign created permissions
-        foreach ($this->roles as $value) {
-            $role = Role::create(['name' => $value]);
-            // dump($value);
+        // asigna permisos a los roles
+        foreach (Role::all() as $role) {
 
             // asigna permisos a roles
-            if ($value == 'admin') {
-                // $role = Role::where('name', 'admin')->get();
+            if ($role == 'admin') {
                 // dd($role);
                 $role->syncPermissions(Permission::all());
-            } elseif ($value == 'user' || $value == 'client' || $value == 'seller') {
-                // $role = Role::findByName('user')->get();
-                $role->syncPermissions(Permission::where('name', 'like', "%$value%")->get());
+            } elseif ($rol == 'client' || $rol == 'seller' || $rol == 'user') {
+                $role->syncPermissions(Permission::where('name', 'like', "%$role%")->get());
                 // dd($role);
             } else {
-                // $role = Role::findByName('user')->get();
-                $role->syncPermissions($this->permissions2);
+                $role->syncPermissions(array_merge($this->permissions1, $this->permissions2));
                 // dd($role);
             }
         }
-
-        $perm = array_merge($this->permissions1, $perm);
 
         // if ($role->name == 'admin' || $role->name == 'user') {
         //     $role->syncPermissions(Permission::all());

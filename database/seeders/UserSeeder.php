@@ -93,11 +93,50 @@ class UserSeeder extends Seeder
         //     $user->profile()->save(factory(App\UserProfile::class)->make());
         // });
 
-        $roles = Role::all()->pluck('name')->toArray();
-        User::factory(98)
+        // $roles = Role::all()->pluck('name')->toArray();
+        // User::factory(98)
+        //     ->create()
+        //     ->each(function ($user) use ($roles) {
+        //         $user->assignRole(array_rand($roles, rand(1, 4)));
+
+        //         UserSetting::factory()->create([
+        //             'user_id' => $user->id,
+        //         ]);
+        //         // Perfil::factory()->create([
+        //         //     'user_id' => $user->id,
+        //         // ]);
+        //     });
+
+        $roles = ['admin', 'client', 'seller'];
+
+        User::factory(1)
             ->create()
-            ->each(function ($user) use ($roles) {
-                $user->assignRole(array_rand($roles), rand(1, 2));
+            ->each(function ($user) {
+                $user->assignRole('admin');
+
+                UserSetting::factory()->create([
+                    'user_id' => $user->id,
+                ]);
+                // Perfil::factory()->create([
+                //     'user_id' => $user->id,
+                // ]);
+            });
+        User::factory(1)
+            ->create()
+            ->each(function ($user) {
+                $user->assignRole('client');
+
+                UserSetting::factory()->create([
+                    'user_id' => $user->id,
+                ]);
+                // Perfil::factory()->create([
+                //     'user_id' => $user->id,
+                // ]);
+            });
+        User::factory(1)
+            ->create()
+            ->each(function ($user) {
+                $user->assignRole('seller');
 
                 UserSetting::factory()->create([
                     'user_id' => $user->id,

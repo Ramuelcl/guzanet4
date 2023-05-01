@@ -5,15 +5,18 @@
             <h2>
                 {{__('Laravel 10 Jetstream Livewire CRUD Example - Creación de DataTable lauchoIT ')}}
             </h2>
-            <p> / Contenido publico</p>
+            <p>Contenido público</p>
             @role('Super-admin')
             <p>solo lo ve el role:Super-admin</p>
             @endrole
             @role('admin')
-            <p>solo lo ve el role:Super-admin, admin</p>
+            <p>solo lo ve el role:admin</p>
             @endrole
             @role('guest')
             <p>solo lo ve el role:guest</p>
+            @endrole
+            @role('user')
+            <p>solo lo ve el role:user</p>
             @endrole
         </div>
     </x-slot>
