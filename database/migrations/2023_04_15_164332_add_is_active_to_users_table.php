@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            // agregar un campo
+            $table->boolean('is_active')->default(true)->after('profile_photo_path');
+            // modificar campos
+            // * para alterar campos hay que ejecutar antes
+            // * composer require doctrine/dbal
+            // $table->string('name', 50)->nullable()->change();
+            $table->string('password')->nullable()->default(null)->change();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_active');
+            // $table->string('name', 255)->nullable(false)->change();
+            // $table->string('password', 255)->change();
+        });
+    }
+};

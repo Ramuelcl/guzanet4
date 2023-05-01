@@ -1,0 +1,22 @@
+tabla;tabla_id;nombre;descripcion;activo;valor1;valor2;valor3;deleted_at;created_at;updated_at
+15100;0;Banca;movimientos -concentrados;0;\N;\N;0;\N;\N;\N
+15100;1;REIGN;pagos de clientes;1;1.00;\N;0;\N;\N;\N
+15100;2;DIOURON;pagos de clientes;1;2.00;\N;0;\N;\N;\N
+15100;9;PUVIS;pagos de clientes;1;9.00;\N;0;\N;\N;\N
+15100;22;AC2 PRODUCTION;pagos de clientes;1;22.00;\N;0;\N;\N;\N
+15100;69;CRUCELISA ARISTIZABAL;movimientos personales;1;69.00;\N;0;\N;\N;\N
+15100;70;REGINA;movimientos personales;1;70.00;\N;0;\N;\N;\N
+15100;1500;Navigo;proveedores;1;1500.00;\N;0;\N;\N;\N
+15100;1501;SFR;proveedores;0;1501.00;\N;0;\N;\N;\N
+15100;1502;Google YouTube;proveedores;1;1502.00;\N;0;\N;\N;\N
+15100;1503;Orange;proveedores;1;1503.00;\N;0;\N;\N;\N
+15100;1504;Samsung;proveedores;1;1504.00;\N;0;\N;\N;\N
+15100;1505;Sosh;proveedores;1;1503.00;\N;0;\N;\N;\N
+15100;1506;Free;proveedores;0;1506.00;\N;0;\N;\N;\N
+15100;1600;FORMULE DE COMPTE ;La Poste;1;1600.00;\N;0;\N;\N;\N
+15100;1601;DIRECTION GENERAL;IMPOTS;1;1601.00;\N;0;\N;\N;\N
+15100;99;MUNOZ ALBUERNO;movimientos personales;1;99.00;\N;0;\N;\N;\N
+15100;1603;FORFAITAIRE TRIMESTRIEL;La Poste;1;1600.00;\N;0;\N;\N;\N
+15100;1700;ACHAT CB;Compras Carte Blue;1;1700.00;\N;0;\N;\N;\N
+15100;1701;AMAZON;Compras Carte Blue;1;1700.00;\N;0;\N;\N;\N
+15100;1702;CDISCOUNT;Compras Carte Blue;1;1700.00;\N;0;\N;\N;\N
