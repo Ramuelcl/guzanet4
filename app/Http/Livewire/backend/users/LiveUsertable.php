@@ -82,7 +82,7 @@ class LiveUsertable extends Component
     public $email = '';
     public $is_active = '';
     public $profile_photo_path = '';
-    public $role = '';
+    public $role = [];
     public $password = '';
     public $password_confirmation = '';
     public $item = null;
@@ -166,7 +166,7 @@ class LiveUsertable extends Component
 
     public function updatedQuery()
     {
-        $this->userRoles = Role::all('id', 'name')->toArray();
+        $this->userRoles = Role::pluck('name', 'name')->toArray();
         // dd($this->userRoles);
         // if ($this->readyToLoad) {
         $collection = Item::where('id', '>', 0)
@@ -330,6 +330,9 @@ class LiveUsertable extends Component
 
             $item = new Item;
             $item->fill($values);
+
+            // asigna el rol
+            $item->assignRole($values['role']);
 
             // agrega donde se guardó la foto físicamente
             $item->profile_photo_path = $location;

@@ -35,7 +35,7 @@ class User extends Authenticatable
         'password',
         'profile_photo_path',
         'is_active',
-        'role',
+        // 'role',
     ];
 
     /**
@@ -87,11 +87,11 @@ class User extends Authenticatable
         return $query->where('is_active', 1);
     }
     // rol incrustado en la tabla user
-    public function scopeRole($query, $role)
-    {
-        if ($role)
-            return $query->whereRole($role);
-    }
+    // public function scopeRole($query, $role)
+    // {
+    //     if ($role)
+    //         return $query->whereRole($role);
+    // }
     // rol incrustado en la tabla user
     public function scopeTermino($query, $termino)
     {

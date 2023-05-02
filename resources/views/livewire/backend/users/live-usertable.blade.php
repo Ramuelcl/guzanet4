@@ -24,7 +24,7 @@ app/Http/Livewire/backend/users/LiveUsertable.php
                 <select wire:model.lazy="wmUserRoles" class="h-9 bg-gray-50 border text-gray-800 dark:bg-gray-800 dark:text-gray-50 text-sm rounded-lg focus:ring-blue-500 dark:focus:ring-blue-500">
                     <option value="">Roles</option>
                     @foreach ($userRoles as $wmUserRoles)
-                    <option value="{{ $wmUserRoles['name'] }}">{{ $wmUserRoles['name'] }}</option>
+                    <option value="{{ $wmUserRoles }}">{{ $wmUserRoles }}</option>
                     @endforeach
                 </select>
                 @endif
@@ -122,7 +122,7 @@ app/Http/Livewire/backend/users/LiveUsertable.php
                         </td>
 
                         <td class="px-6 py-4">
-                            {{ $item->role }}
+                            {{ $item->roles()->first()->name ?? 'sin Rol' }}
                         </td>
 
                         <div>
@@ -197,7 +197,7 @@ app/Http/Livewire/backend/users/LiveUsertable.php
                             </div>
                             @endif
                             <div>
-                                @if ($profile_photo_path !== '')
+
                                 @if (substr($profile_photo_path, 0, 8) == 'https://')
                                 <img class="h-10 w-10 text-gray-800 dark:text-gray-50 rounded-full" src="{{ $profile_photo_path }}" alt="img">
                                 <x-forms.input-photo idName="profile_photo_path" label="{{ __('Foto') }}" value="{{ $profile_photo_path }}" />
@@ -205,7 +205,7 @@ app/Http/Livewire/backend/users/LiveUsertable.php
                                 <img class="h-10 w-10 text-gray-800 dark:text-gray-50 rounded-full" src="{{ asset('storage/' . $profile_photo_path) }}" alt="img">
                                 <x-forms.input-photo idName="profile_photo_path" label="{{ __('Foto') }}" value="{{ asset('storage/' . $profile_photo_path) }}" />
                                 @endif
-                                @endif
+
                             </div>
                             <div>
                                 <x-forms.input-checkbox idName="is_active" label="{{ __('Active ?') }}" />

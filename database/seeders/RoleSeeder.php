@@ -78,11 +78,11 @@ class RoleSeeder extends Seeder
         foreach (Role::all() as $role) {
 
             // asigna permisos a roles
-            if ($role == 'admin') {
+            if ($role->name == 'admin') {
                 // dd($role);
                 $role->syncPermissions(Permission::all());
-            } elseif ($rol == 'client' || $rol == 'seller' || $rol == 'user') {
-                $role->syncPermissions(Permission::where('name', 'like', "%$role%")->get());
+            } elseif ($role->name == 'client' || $role->name == 'seller' || $role->name == 'user') {
+                $role->syncPermissions(Permission::where('name', 'like', "%$role->name%")->get());
                 // dd($role);
             } else {
                 $role->syncPermissions(array_merge($this->permissions1, $this->permissions2));

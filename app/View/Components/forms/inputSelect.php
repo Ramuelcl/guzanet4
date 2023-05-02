@@ -16,8 +16,9 @@ class inputSelect extends Component
      */
     public function __construct(string $idName,  array $options = [], $selected = 0, $label = "")
     {
+        // dd($options, $selected);
         $this->idName = $idName;
-        $this->options = array_column($options, 'name');
+        $this->options = $options;
         // $this->options = array_merge(["Select..."], array_values($options));
         $this->selected =  $selected;
         $this->label =  $label;

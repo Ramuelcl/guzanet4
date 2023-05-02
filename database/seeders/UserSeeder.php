@@ -110,7 +110,12 @@ class UserSeeder extends Seeder
         $roles = ['admin', 'client', 'seller'];
 
         User::factory(1)
-            ->create()
+            ->create(
+                [
+                    'name' => 'admin',
+                    'email' => 'admin@mail.com',
+                ]
+            )
             ->each(function ($user) {
                 $user->assignRole('admin');
 
@@ -122,7 +127,12 @@ class UserSeeder extends Seeder
                 // ]);
             });
         User::factory(1)
-            ->create()
+            ->create(
+                [
+                    'name' => 'cliente',
+                    'email' => 'cliente@mail.com',
+                ]
+            )
             ->each(function ($user) {
                 $user->assignRole('client');
 
@@ -134,7 +144,12 @@ class UserSeeder extends Seeder
                 // ]);
             });
         User::factory(1)
-            ->create()
+            ->create(
+                [
+                    'name' => 'vendedor',
+                    'email' => 'vendedor@mail.com',
+                ]
+            )
             ->each(function ($user) {
                 $user->assignRole('seller');
 

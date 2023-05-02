@@ -36,10 +36,10 @@ Route::controller(PrincipalController::class)
     });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('user/list', [UserController::class, 'index'])->name('user.list');
-    Route::view('seller/list', 'seller.list')->name('seller.list');
-    Route::view('client/list', 'client.list')->name('client.list');
-    Route::view('backend/roles', 'backend.roles')->name('roles.list');
+    Route::get('user/list', [UserController::class, 'index'])->name('user.list')->middleware('role:admin');
+    Route::view('seller/list', 'seller.list')->name('seller.list')->middleware('role:admin|seller');
+    Route::view('client/list', 'client.list')->name('client.list')->middleware('role:admin|client');
+    Route::view('backend/roles', 'backend.roles')->name('roles.list')->middleware('role:admin');
 });
 
 // Route::group(['middleware' => ['auth']], function () {
