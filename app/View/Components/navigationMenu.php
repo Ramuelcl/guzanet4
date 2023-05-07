@@ -46,8 +46,8 @@ class navigationMenu extends Component
             [
                 'name' => 'roles',
                 'title' => 'Roles & Permisos',
-                'route' => 'roles.list', //'roles.index',
-                'active' =>  'roles.*',
+                'route' => 'role.list', //'roles.index',
+                'active' =>  'role.*',
                 'role' => 'admin',
                 'disabled' => false,
                 'subMenu' => null,

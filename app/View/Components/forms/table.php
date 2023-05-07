@@ -19,7 +19,7 @@ class table extends Component
      * @return void
      */
     public function __construct(
-        $caption = null,
+        $caption = 'Título de la tabla',
         $tTitles = 'capitalize',
         $tAlign = 'text-center',
 

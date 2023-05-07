@@ -6,6 +6,6 @@
 @section('message')
 {{__($exception->getMessage() ?: 'Unauthorized')}}
 <br>
-<br>
+<hr class="text-black">
 <a href="{{ route('home') }}">{{__('Volver al inicio')}}</a>
 @endsection

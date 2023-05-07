@@ -7,11 +7,10 @@
 
 namespace App\Http\Livewire\Backend\Users;
 
-use App\Http\Requests\usuarioRequest;
-use App\Models\backend\Perfil;
 use Livewire\{Component, TemporaryUploadedFile, WithPagination, WithFileUploads};
+use App\Http\Requests\usuarioRequest;
+// use App\Models\backend\Perfil;
 use App\Models\User as Item;
-use Illuminate\Console\View\Components\Alert;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;

@@ -5,6 +5,6 @@
 @section('message')
 {{__($exception->getMessage() ?: 'Forbidden')}}
 <br>
-<br>
+<hr class="text-black">
 <a href="{{ route('home') }}">{{__('Volver al inicio')}}</a>
 @endsection

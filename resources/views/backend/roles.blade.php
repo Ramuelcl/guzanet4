@@ -7,12 +7,12 @@
             </h2>
         </div>
     </x-slot>
-    <div class="mx-auto py-6 bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-50">
-        <div class="container md:flex">
-            <main class="px-4 mb-6" flex-grow>
-                roles
-            </main>
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @livewire('backend.users.live-roletable')
         </div>
-
     </div>
+    @push('modals')
+    @livewire('live-modal',[false])
+    @endpush
 </x-app-layout>

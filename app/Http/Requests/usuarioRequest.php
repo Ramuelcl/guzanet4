@@ -31,11 +31,12 @@ class usuarioRequest extends FormRequest
         // dd($id, $user);
         $reglas = [
             'name' => ['required', 'string', 'min:6', 'max:50'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'min:10', 'max:30', "unique:users,id,except,$id"],
+            // 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             // Rule::unique('users', 'email')->ignore($email)],
-            'is_active' => 'boolean',
-            'profile_photo_path' => 'nullable|image:png,jpg,jpeg|max:1024',
-            'role' => 'required',
+            'is_active' => ['boolean'],
+            'profile_photo_path' => ['nullable', 'image', 'max:1024'], // 'nullable|image:png,jpg,jpeg|max:1024',
+            'role' => ['required'],
         ];
 
         if (!$user) {

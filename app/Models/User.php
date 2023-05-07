@@ -104,12 +104,12 @@ class User extends Authenticatable
     /**
      * recupera los roles del usuario
      */
-    public function probando_roles($id)
+    public function r_roles($id)
     {
         return $this->belongsToMany(Role::class, $id);
     }
     /**
-     * recupera los roles del usuario
+     * recupera el perfil del usuario
      */
     public function r_perfil()
     {
