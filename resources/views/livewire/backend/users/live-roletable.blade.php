@@ -1,16 +1,21 @@
 <div>
     <!--
-resources/views/livewire/backend/users/live-usertable.blade.php
-app/Http/Livewire/backend/users/LiveUsertable.php
+resources/views/livewire/backend/users/live-roletable.blade.php
+app/Http/Livewire/backend/users/LiveRoletable.php
 -->
     <div class="max-w-max mx-auto">
+        @if ($message = Session::get('success'))
+            <div class="alert alert-success">
+                <p>{{ $message }}</p>
+            </div>
+        @endif
 
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <div class="flex justify-between p-4 text-gray-500">
+            @if ($bSearch)
+                <div class="flex justify-between p-4 text-gray-500">
 
-                @livewire('live-search')
 
-                @if ($bSearch)
+                    @livewire('live-search')
                     <button wire:click="wc_Clear()" class="justify-between text-xs"><svg xmlns="http://www.w3.org/2000/svg"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                             class="w-6 h-6 text-gray-800 dark:text-gray-50"">
@@ -19,8 +24,8 @@ app/Http/Livewire/backend/users/LiveUsertable.php
                         </svg>
 
                         {{ __($display['clear']) }}</button>
-                @endif
-            </div>
+                </div>
+            @endif
             <x-forms.table caption="Roles">
                 <x-slot name="titles">
                     <tr>
@@ -29,27 +34,16 @@ app/Http/Livewire/backend/users/LiveUsertable.php
                         </th> --}}
                         @foreach ($fields as $key => $field)
                             @if (!$field['table']['hidden'])
-                                @php
-                                    // dd($key, $field);
-                                    // valida el campo a ordenar; si existe le pone cursor-pointer
-                                    $orden = in_array($key, $fieldsOrden) ? $key : null;
-                                    $uppercase = $key == $sortField1 ? 'uppercase font-bold' : 'capitalize';
-                                @endphp
-
                                 @switch($key)
                                     @case(0)
                                     @break
 
                                     @default
-                                        <th wire:click="wc_Orden('{{ $orden }}','roles')" scope="colgroup"
-                                            class="{{ $orden ? 'cursor-pointer' : '' }} {{ $uppercase }} text-center text-xs font-medium">
+                                        <th class="text-center">
                                             <div>
                                                 {{ __($field['title']) }}
                                             </div>
-                                            <div class="">
-                                                <x-forms.sort-icon campo="{{ $key }}" :sortDir="$sortDir1"
-                                                    :sortField="$sortField1" />
-                                            </div>
+
                                         </th>
                                     @break
                                 @endswitch
@@ -109,7 +103,7 @@ app/Http/Livewire/backend/users/LiveUsertable.php
                                 <td class="pr-2 text-right">
                                     @can('delete')
                                         @if (!$item1->count_user)
-                                            <span onclick="js_borrar({{ $item1->id }})"
+                                            <span onclick="js_borrar({{ $item1 }})"
                                                 class="px-2 cursor-pointer inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100">
                                                 {{ __('Delete') }}
                                             </span>
@@ -163,14 +157,14 @@ app/Http/Livewire/backend/users/LiveUsertable.php
         <script>
             // console.log("llegó");
 
-            function js_borrar(user) {
+            function js_borrar(item) {
                 if (confirm('Realmente quiere borrar al usuario ?')) {
-                    Livewire.emit('DeleteUserConfirm', user);
+                    Livewire.emit('DeleteConfirm', item);
                     // } else {
                     //     alert("se salvo");
                 }
             }
-            Livewire.on('deleteUser', (user) => {
+            Livewire.on('Destroy', (item) => {
                 alert('Se borró al usuario correctamente');
             });
         </script>

@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -68,18 +69,18 @@ class LiveRoletable extends Component
     protected $items2 = null;
 
     // orden y filtro
-    public $sortField1 = 'id', $sortDir1 = 'asc';
-    public $sortField2 = 'id', $sortDir2 = 'asc';
+    public $sortField1 = 'name', $sortDir1 = 'asc';
+    public $sortField2 = 'name', $sortDir2 = 'asc';
     // campos por los cuales ordenar
-    public $fieldsOrden = array('id', 'name');
+    public $fieldsOrden = array('name');
 
-    public $nameOrden = array('id', 'Nombre');
+    public $nameOrden = array('Nombre');
 
     public $wmViews = 5;
     public $collectionViews = array('5', '10', '25', '50',); //'all'
 
     // elemento de busqueda
-    public $fieldsSearch = array('id', 'name');
+    public $fieldsSearch = array('name');
     public $bSearch;
     public $search = '';
 
@@ -116,7 +117,7 @@ class LiveRoletable extends Component
         'search' => 'fncSearch',
         'updatingSearch',
         'closeModal',
-        'DeleteUserConfirm' => 'DeleteUser',
+        'DeleteConfirm' => 'Destroy',
         'render',
         'fncStoreRole'
         // 'roleUpdating' => 'render',
@@ -131,9 +132,10 @@ class LiveRoletable extends Component
     public function __construct()
     {
         $this->bActive = false;
-        $this->bSearch = true;
+        $this->bSearch = false;
         $this->bChk = false;
-        $this->emitTo('live-search', 'fncSearchFields', $this->nameOrden);
+        if ($this->bSearch)
+            $this->emitTo('live-search', 'fncSearchFields', $this->nameOrden);
     }
 
     public function render()
@@ -148,27 +150,27 @@ class LiveRoletable extends Component
 
     public function updatedQuery()
     {
-        $roles = Role::all();
-        //     ->when($this->search, function ($query) {
-        //         $srch = "%$this->search%";
-        //         return $query->where('id', 'like', $srch)
-        //             ->orWhere('name', 'like', $srch);
-        //     })
+        $collection = Role::where('id', '>', '0')->get();
 
-        //     ->when($this->sortField1 || $this->sortDir1, function ($query) {
-        //         return $query->orderBy($this->sortField1, $this->sortDir1);
-        //     });
-        // dd($roles);
-        $roles = $roles->each(function ($role) {
+        $collection = $collection->when($this->search, function ($query) {
+            $srch = "%$this->search%";
+            return $query->Where('name', 'like', $srch);
+        });
+        $collection = $collection->when($this->sortField1 || $this->sortDir1, function ($query) {
+            // return $query->orderBy($this->sortField1, $this->sortDir1);
+        });
+        // dd($collection);
+
+        $collection = $collection->each(function ($role) {
             $role->count_user = User::role($role->id)->count();
         });
-        $this->items1 = $roles;
+        $this->items1 = $collection;
 
         $this->items2 = Permission::where('id', '>', 0)
             ->when($this->search, function ($query) {
                 $srch = "%$this->search%";
-                return $query->where('id', 'like', $srch)
-                    ->orWhere('name', 'like', $srch);
+                // dd($srch);
+                return $query->where('name', 'like', $srch);
             })
 
             ->when($this->sortField2 || $this->sortDir2, function ($query) {
@@ -201,7 +203,7 @@ class LiveRoletable extends Component
             // Item::orWhere('name', 'like', "%{$this->search}%"
         }
     }
-    public function wc_Orden($sortField = 'id', $tabla)
+    public function wc_Orden($sortField = 'name', $tabla)
     {
         if ($sortField == null || !in_array($sortField, $this->fieldsOrden))
             return;
@@ -258,23 +260,27 @@ class LiveRoletable extends Component
     }
     public function wc_ConfirmDelete($item)
     {
+        dd($this->item);
         $this->fncLlenarCampos($item);
 
         $this->modalTitle = __("Delete Register : ");
-        $this->modalAction = $item;
+        $this->modalAction = 'Destroy';
         $this->modalButton = __("Yes");
 
         // $this->fncModal(2);
     }
-    public function DeleteUser($item)
+    public function Destroy($item)
     {
-        // dd($this->item);
+        // dd($item);
+        $item = Role::find($item['id']);
 
         $item->delete();
 
+        Session::flash('success', 'Registro borrado satisfactoriamente');
         $this->emit('render');
         $this->wc_Clear();
-        $this->emit('deleteUser');
+
+        $this->emit('delete');
     }
 
     public function fncStoreRole($item)
@@ -284,14 +290,17 @@ class LiveRoletable extends Component
         if ($this->modalAction['id']) {
             $this->item = Role::find($this->modalAction['id']);
             $this->item->update(['name' => $item['name']]);
+            $message = 'Role edited successfully';
         } else {
             Role::create(['name' => $item['name'], 'guard_name' => "web"]);
+            $message = 'Role created successfully';
         }
 
         // asigna el rol
         // $item->assignRole($values['role']);
 
         //
+        Session::flash('success', $message);
         $this->emit('render');
         $this->wc_Clear();
     }

@@ -9,7 +9,39 @@
 // ejecutar: composer dump-autoload
 
 //
+if (!function_exists('fncCan')) {
+    function fncCan(string $permission): bool
+    {
+        if (!auth()->user()->can($permission)) {
+            abort(403, 'No se tienen los permisos requeridos');
+        }
+    }
+}
+if (!function_exists('fncHasPermissions')) {
+    function fncHasPermissions(array $needles): bool
+    {
+        $accesoPer = 0;
+        $permissions = auth()->user()->getPermissionsViaRoles();
+        // dd($permissions, $needles);
+        $accesoPer = false;
+        $permissions->filter(function ($haystack) use ($needles, $accesoPer) {
+            // dump(['haystack' => $haystack, 'needles' => $needles]);
+            // ------------
+            // return \Illuminate\Support\Str::contains($haystack->name, $needles);
+            // ------------
 
+            // ------------
+            foreach ($needles as $needle) {
+                // dump(['accesoPer' => $accesoPer, 'needle' => $needle, 'haystack' => $haystack->name]);
+                $accesoPer = \Illuminate\Support\Str::contains($haystack->name, $needle) ? true : $accesoPer;
+                if ($accesoPer)
+                    break;
+            }
+            // // dump(['needles' => $needles, 'haystack' => $haystack->name, 'accesoPer' => $accesoPer]);
+        });
+        return $accesoPer ? true : false;
+    }
+}
 
 if (!function_exists('fncGlob_Files')) {
     // TODO: recursividad en directorios

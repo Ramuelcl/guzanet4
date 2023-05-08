@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 // use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
 class usuarioRequest extends FormRequest
 {
@@ -23,6 +24,9 @@ class usuarioRequest extends FormRequest
      */
     public function rules($user = null): array
     {
+        $roles = Role::pluck('name');
+        $roles = $roles->join(',');
+        // dd($roles);
         if (is_array($user)) {
             $user = $user[0];
             $id = $user->id ?? 0;
@@ -36,7 +40,7 @@ class usuarioRequest extends FormRequest
             // Rule::unique('users', 'email')->ignore($email)],
             'is_active' => ['boolean'],
             'profile_photo_path' => ['nullable', 'image', 'max:1024'], // 'nullable|image:png,jpg,jpeg|max:1024',
-            'role' => ['required'],
+            'role' => ['required', "in:{$roles}"],
         ];
 
         if (!$user) {

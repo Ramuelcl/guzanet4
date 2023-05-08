@@ -36,10 +36,10 @@ Route::controller(PrincipalController::class)
     });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('user/list', [UserController::class, 'indexUsers'])->name('user.list')->middleware('role:admin');
-    Route::get('role/list', [UserController::class, 'indexRoles'])->name('role.list')->middleware('role:admin');
-    Route::view('seller/list', 'seller.list')->name('seller.list')->middleware('role:admin|seller');
-    Route::view('client/list', 'client.list')->name('client.list')->middleware('role:admin|client');
+    Route::get('user/list', [UserController::class, 'indexUsers'])->name('user.list')->middleware('guzanet4:admin|user');
+    Route::get('role/list', [UserController::class, 'indexRoles'])->name('role.list')->middleware('guzanet4:admin');
+    Route::view('seller/list', 'seller.list')->name('seller.list')->middleware('guzanet4:admin|seller');
+    Route::view('client/list', 'client.list')->name('client.list')->middleware('guzanet4:admin|client');
 });
 
 // Route::group(['middleware' => ['auth']], function () {

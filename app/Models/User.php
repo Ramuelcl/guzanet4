@@ -104,9 +104,9 @@ class User extends Authenticatable
     /**
      * recupera los roles del usuario
      */
-    public function r_roles($id)
+    public function r_role($id)
     {
-        return $this->belongsToMany(Role::class, $id);
+        return $this->hasMany(Role::class);
     }
     /**
      * recupera el perfil del usuario
