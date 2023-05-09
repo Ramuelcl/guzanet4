@@ -158,13 +158,15 @@ app/Http/Livewire/backend/users/LiveRoletable.php
             // console.log("llegó");
 
             function js_borrar(item) {
-                if (confirm('Realmente quiere borrar al usuario ?')) {
+                if (confirm('Realmente quiere borrar el registro ?')) {
                     Livewire.emit('DeleteConfirm', item);
                     // } else {
                     //     alert("se salvo");
                 }
             }
             Livewire.on('Destroy', (item) => {
+                // agregarToast("info", "Eliminando registro", "Se elimino registro: ".item.
+                //     " satisfactoriamente", true);
                 alert('Se borró al usuario correctamente');
             });
         </script>

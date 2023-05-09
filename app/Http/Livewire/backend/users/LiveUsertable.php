@@ -320,8 +320,8 @@ class LiveUsertable extends Component
             /**
              * actualizar tablas asociadas
              *
-             * $this->item->r_role()->update(['role' => $values['role']]);
              */
+            $this->item->syncRoles([$values['role']]);
         } else {
             // nuevo registro
             $location = $this->fncLoadImage($values['profile_photo_path']);
@@ -433,7 +433,7 @@ class LiveUsertable extends Component
         $this->email = $this->item->email;
         $this->is_active = $this->item->is_active;
         $this->profile_photo_path = $this->item->profile_photo_path;
-        $this->role = $this->item->role;
+        $this->role = $this->item->Roles()->first()->name;
         // dd($this->name, $this->email, $this->is_active, $this->profile_photo_path, $this->role);
     }
     public function fncModal($modal)

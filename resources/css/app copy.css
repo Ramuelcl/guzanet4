@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+/* Toast */
+:root {
+    --exito: #3ab65c;
+    --error: #bf333b;
+    --info: #1898c0;
+    --warning: #bc8c12;
+    --exito-hover: #2d8a46;
+    --error-hover: #962a31;
+    --info-hover: #147fa0;
+    --warning-hover: #9b7512;
+}
+
+.contenedor-toast {
+    /* background: black; */
+    color: white;
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 20;
+}
+
+.toast {
+    background: gray;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 10px;
+    overflow: hidden;
+    animation-name: toast-apertura;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+    position: relative;
+}
+
+.toast .icono {
+    color: rgb(0, 0, 0, 0.4);
+}
+
+.toast.info {
+    background: var(--info);
+}
+
+.toast.exito {
+    background: var(--exito);
+}
+
+.toast.warning {
+    background: var(--warning);
+}
+
+.toast.error {
+    background: var(--error);
+}
+
+.toast .contenido {
+    display: grid;
+    grid-template-columns: 3px auto;
+    align-items: center;
+    gap: 25px;
+    padding: 15px;
+}
+
+.toast .titulo {
+    font-size: 25px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.toast .btn-cerrar {
+    background: rgb(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+    padding: 0% 5px;
+}
+
+.toast .btn-cerrar:hover {
+    background: rgb(0, 0, 0, 0.3);
+    transition: 0.5s ease all;
+}
+
+.toast .btn-cerrar .icono {
+    width: 20px;
+    height: 20px;
+    color: whitesmoke;
+}
+
+@keyframes toast-apertura {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+.toast.cierre {
+    animation-name: toast-cierre;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+}
+
+@keyframes toast-cierre {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(100%+40px));
+    }
+}
+
+.toast.autoCierre::after {
+    content: "";
+    width: 100%;
+    height: 4px;
+    background: rgb(0, 0, 0, 0.5);
+    position: absolute;
+    bottom: 0;
+    animation-name: auto-cierre;
+    animation-duration: 5s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+}
+
+@keyframes auto-cierre {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}

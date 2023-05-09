@@ -25,21 +25,23 @@ class LiveRoletable extends Component
     use WithPagination;
 
     public $display = [
-        'title' => 'Roles',
-        'caption1' => 'Roles',
-        'caption2' => 'Permisos',
+        'title' => 'Roles & Permissions',
+        'caption1' => 'Role',
+        'caption2' => 'Permission',
         'clear' => 'Clear',
         'no records' => 'No records to show',
-        'created' => 'creado...',
-        'edited' => 'editado...',
-        'deleted' => 'borrado...',
-        'new' => 'Crear',
-        'show' => 'Ver',
-        'save' => 'Guardar',
-        'actions' => 'Acciones',
-        'delete' => 'Borrar',
-        'edit' => 'Editar',
-        'search' => 'Buscar...',
+        'created' => 'Role created successfully',
+        'edited' => 'Role edited successfully',
+        'deleted' => 'Role deleted successfully',
+        'actions' => 'actions',
+        'new' => 'New',
+        'edit' => 'Edit',
+        'show' => 'show',
+        'delete' => 'delete',
+        'options' => 'options',
+        'save' => 'save',
+        'update' => 'update',
+        'search' => 'Search...',
     ];
 
     public $fields = [
@@ -64,7 +66,7 @@ class LiveRoletable extends Component
     ];
 
     /** campos del formulario */
-    public $item = null;
+    public $item = [];
     protected $items1 = null;
     protected $items2 = null;
 
@@ -226,23 +228,14 @@ class LiveRoletable extends Component
         // $this->updatedQuery();
     }
 
-    public function wc_ItemAddEdit($item)
+    public function wc_ItemAddEdit($item = 0)
     {
         $this->wc_Clear();
         // dd($item);
-        if ($item === 0) //crear
-        {
-            $this->modalAction = ['model' => 'role', 'id' => 0, 'item' => ['name' => ''], 'action' => 'new', 'call' => 'fncStoreRole'];
-            $this->fncLimpiarCampos();
-        } else { // editar
+        $this->fncValoresDeModal($item, 'role');
 
-            $this->modalAction = ['model' => 'role', 'id' => $item['id'], 'item' => $item, 'action' => 'edit', 'call' => 'fncStoreRole'];
-            $this->fncLlenarCampos($item);
-        }
-        //
         $this->emitTo('live-modal', 'fncCargaModal', $item, $this->modalTitle, $this->modalButton, $this->modalAction);
-        // $this->fncToggleModal();
-        // dd($this->name, $this->email, $this->is_active, $this->profile_photo_path, $this->role);
+
         return;
     }
     public function wc_Show()
@@ -254,7 +247,7 @@ class LiveRoletable extends Component
         $this->resetErrorBag();
         $this->resetValidation();
         $this->resetPage();
-        $this->reset();
+        $this->reset('item');
         // $this->reset(['search', 'activeAll', 'sortField', 'sortDir', 'wmViews', 'wmUserRoles']);
         $this->emit('fncSearchClear');
     }
@@ -275,8 +268,9 @@ class LiveRoletable extends Component
         $item = Role::find($item['id']);
 
         $item->delete();
-
-        Session::flash('success', 'Registro borrado satisfactoriamente');
+        // echo "<script> agregarToast('info, 'Eliminando registro', 'Se elimino registro satisfactoriamente', true);</script>";
+        // $this->agregarToast("info", "Eliminando registro", "Se elimino registro:" . $item['id'] . " Satisfactoriamente", true);
+        Session::flash('success', $this->display['deleted']);
         $this->emit('render');
         $this->wc_Clear();
 
@@ -290,10 +284,10 @@ class LiveRoletable extends Component
         if ($this->modalAction['id']) {
             $this->item = Role::find($this->modalAction['id']);
             $this->item->update(['name' => $item['name']]);
-            $message = 'Role edited successfully';
+            $message = $this->display['edited'];
         } else {
             Role::create(['name' => $item['name'], 'guard_name' => "web"]);
-            $message = 'Role created successfully';
+            $message = $this->display['created'];
         }
 
         // asigna el rol
@@ -347,41 +341,33 @@ class LiveRoletable extends Component
      * control de formularios
      *
      * */
-    public function fncLimpiarCampos()
+    public function fncValoresDeModal($item = null, $modelo = null)
     {
-        $this->modalTitle = __("New Register");
-        $this->modalButton = __("Save");
+        switch (\Illuminate\Support\Str::lower($modelo)) {
+            case 'role':
+                if ($item) { // editar
+                    $num = $item['id'];
+                    $this->modalTitle = __($this->display['edit'] . " : ") . $num;
+                    $this->modalButton = __($this->display['update']);
 
-        // $this->reset(
-        //     'name',
-        // );
-    }
-    public function fncLlenarCampos($i)
-    {
-        // dd($i);
-        // $this->items1 = Role::findById($i); //->pluck("name");
-        // dd($this->items1);
-        $this->modalTitle = __("Edit Register : ") . $i['id'];
-        $this->modalButton = __("Update");
+                    $this->modalAction = ['model' => $modelo, 'id' => $item['id'], 'item' => $item, 'action' => 'edit', 'call' => 'fncStoreRole'];
+                } else { // nuevo
+                    $this->modalTitle = __($this->display['new']);
+                    $this->modalButton = __($this->display['save']);
 
-        // $this->name = $this->items1->name;
-        // return $this->items1;
-        // dd($this->name, $this->email, $this->is_active, $this->profile_photo_path, $this->role);
+                    $this->modalAction = ['model' => $modelo, 'id' => 0, 'item' => ['name' => ''], 'action' => 'new', 'call' => 'fncStoreRole'];
+                }
+                break;
+
+            case 'permissions':
+                # code...
+                break;
+
+            default:
+                # code...
+                break;
+        }
     }
-    // public function fncModal($modal)
-    // {
-    //     if ($modal == 1) {
-    //         if ($this->hidden1 === 'hidden')
-    //             $this->hidden1 = '';
-    //         else
-    //             $this->hidden1 = 'hidden';
-    //     } elseif ($modal == 2) {
-    //         if ($this->hidden2 === 'hidden')
-    //             $this->hidden2 = '';
-    //         else
-    //             $this->hidden2 = 'hidden';
-    //     }
-    // }
 
     public function fncUppercase($field)
     {
@@ -395,22 +381,4 @@ class LiveRoletable extends Component
         $ordena = in_array($field, $this->fieldsOrden) ? $field : null;
         return $ordena;
     }
-    // public function fncToggleModal($option = null)
-    // {
-    //     $this->emitTo('live-modal', 'fncToggleModal');
-
-    //     // $this->showModal = $this->showModal ? false : true;
-
-    //     // if ($option == 'permisos') {
-    //     //     $this->hidden = $this->hidden ? '' : 'hidden';
-    //     // } elseif ($option == 'edit' || $option == 'new') {
-    //     //     $this->hidden1 = $this->hidden1 ? '' : 'hidden';
-    //     // } elseif ($option == 'delete') {
-    //     //     $this->hidden2 = $this->hidden2 ? '' : 'hidden';
-    //     // } else {
-    //     //     $this->hidden =  'hidden';
-    //     //     $this->hidden1 = 'hidden';
-    //     //     $this->hidden2 = 'hidden';
-    //     // }
-    // }
 }

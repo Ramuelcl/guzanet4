@@ -20,8 +20,6 @@
                             <div>
                                 <x-forms.input idName="item.name" label="{{ __('Nombre') }}" />
                             </div>
-
-
                         </div>
                         <div class="bg-blue-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                             <button type="submit"
@@ -35,6 +33,4 @@
             </div>
         </div>
     </div>
-</div>
-
 </div>

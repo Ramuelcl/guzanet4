@@ -22,7 +22,7 @@ class RolePermissionRequest extends FormRequest
     public function rules($table): array
     {
         return [
-            'item.name' => ['required', 'string', 'min:4', 'max:30', "unique:$table,id"]
+            'item.name' => ['required', 'string', 'min:4', 'max:30', "unique:$table,name"]
         ];
     }
 }
