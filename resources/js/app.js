@@ -8,31 +8,34 @@ Alpine.plugin(focus);
 
 Alpine.start();
 
-// Toast
-console.log('Toast')
+if (import.meta.hot)
+    import.meta.hot.accept(() => import.meta.hot.invalidate())
 
-const contenedorBotones = document.getElementById('contenedor-botones');
+// Toast
+// console.log('Toast')
+
+// const contenedorBotones = document.getElementById('contenedor-botones');
 const contenedorToast = document.getElementById('contenedor-toast');
 
 // Event listener para detectar click en los botones
-contenedorBotones.addEventListener('click', (e) => {
-    e.preventDefault();
+// contenedorBotones.addEventListener('click', (e) => {
+//     e.preventDefault();
 
-    const tipo = e.target.dataset.tipo;
+//     const tipo = e.target.dataset.tipo;
 
-    if (tipo === 'exito') {
-        agregarToast({ tipo: 'exito', titulo: 'Exito!', descripcion: 'La operación fue exitosa.', autoCierre: true });
-    }
-    if (tipo === 'error') {
-        agregarToast({ tipo: 'error', titulo: 'Error', descripcion: 'Hubo un error', autoCierre: true });
-    }
-    if (tipo === 'info') {
-        agregarToast({ tipo: 'info', titulo: 'Info', descripcion: 'Esta es una notificación de información.' });
-    }
-    if (tipo === 'warning') {
-        agregarToast({ tipo: 'warning', titulo: 'Warning', descripcion: 'Ten cuidado' });
-    }
-});
+//     if (tipo === 'exito') {
+//         agregarToast({ tipo: 'exito', titulo: 'Exito!', descripcion: 'La operación fue exitosa.', autoCierre: true });
+//     }
+//     if (tipo === 'error') {
+//         agregarToast({ tipo: 'error', titulo: 'Error', descripcion: 'Hubo un error', autoCierre: true });
+//     }
+//     if (tipo === 'info') {
+//         agregarToast({ tipo: 'info', titulo: 'Info', descripcion: 'Esta es una notificación de información.' });
+//     }
+//     if (tipo === 'warning') {
+//         agregarToast({ tipo: 'warning', titulo: 'Warning', descripcion: 'Ten cuidado' });
+//     }
+// });
 
 // Event listener para detectar click en los toasts
 contenedorToast.addEventListener('click', (e) => {
@@ -122,3 +125,27 @@ const agregarToast = ({ tipo, titulo, descripcion, autoCierre }) => {
     nuevoToast.addEventListener('animationend', handleAnimacionCierre);
 };
 
+// Dark
+const btnSwitch = document.querySelector('#switch');
+
+btnSwitch.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    btnSwitch.classList.toggle('active');
+
+    // guardamos el modo en localStorage
+    if (document.body.classList.contains('dark')) {
+        localStorage.setItem('dark-Mode', 'true');
+    } else {
+        localStorage.setItem('dark-Mode', 'false');
+    }
+});
+
+// obtenemos el modo actual
+if (localStorage.getItem('dark-Mode') === 'true') {
+    document.body.classList.add('dark');
+    btnSwitch.classList.add('active');
+} else {
+    document.body.classList.remove('dark');
+    btnSwitch.classList.remove('active');
+
+}

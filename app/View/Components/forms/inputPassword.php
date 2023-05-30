@@ -3,41 +3,28 @@
 namespace App\View\Components\forms;
 
 use Illuminate\View\Component;
-// use Livewire\WithFileUploads;
 
 class inputPassword extends Component
 {
-    // use WithFileUploads;
+    public $type, $idName, $value, $label, $placeholder, $icono = [], $ico = null, $lenIco = 0;
 
-    public $idName, $type, $label, $placeholder;
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct(string $idName, string  $type = 'password', string $label = '', string $placeholder = '')
+    public function __construct(string $idName, string  $type = 'text', string $value = '', string $label = '', string $placeholder = '', $icono = [])
     {
         $this->idName = $idName;
+        $this->$value  = $value;
         $this->type = $type;
         $this->label = $label;
         $this->placeholder = $placeholder;
+        $this->icono = $icono;
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     *
-     * @return \Illuminate\Contracts\View\View|\Closure|string
-     */
     public function render()
     {
         return view('components.forms.input-password');
-    }
-    public function cambiaEstado()
-    {
-        if ($this->type == 'password') {
-            $this->type == 'text';
-        } else {
-            $this->type == 'password';
-        }
     }
 }

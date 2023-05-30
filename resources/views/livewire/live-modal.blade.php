@@ -17,9 +17,14 @@
                                 class="w-10  justify-center rounded-md bg-white text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0">X</button>
                         </div>
                         <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                            <div>
-                                <x-forms.input idName="item.name" label="{{ __('Nombre') }}" />
-                            </div>
+                            @if ($muestraModal & ($muestraModal == true))
+                                @if ($this->modalAction['model'] == 'permission')
+                                    @include('backend.permisosAddEdit')
+                                @else
+                                    @include('backend.rolesAddEdit')
+                                @endif
+                                {{-- @dd($this->modalAction, $muestraModal, 'antes fncValoresDeModal'); --}}
+                            @endif
                         </div>
                         <div class="bg-blue-100 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                             <button type="submit"

@@ -14,6 +14,11 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.6/dist/full.css" rel="stylesheet" type="text/css" /> -->
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+    @livewireStyles
 </head>
 
 <body class="font-sans antialiased text-gray-900 bg-gray-50 dark:text-gray-50 dark:bg-gray-800">
@@ -82,7 +87,7 @@
                 <!-- Page Content -->
                 <main class="text-gray-800 dark:text-gray-50">
                     {{ $slot }}
-                    <div class="contenedor">
+                    <!-- <div class="contenedor">
                         <div class="hero">
                             <h1 class="titulo">Notificaciones Toast</h1>
                             <div class="contenedor-botones" id="contenedor-botones">
@@ -92,9 +97,9 @@
                                 <button class="btn warning" data-tipo="warning">Warning</button>
                             </div>
                         </div>
-
-                        <div class="contenedor-toast" id="contenedor-toast">
-                            <!-- Plantilla de toast
+-->
+                    <div class="contenedor-toast" id="contenedor-toast">
+                        <!-- Plantilla de toast
                             <div class="toast exito" id="1">
                                 <div class="contenido">
                                     <div class="icono">
@@ -174,8 +179,8 @@
                                         </svg>
                                     </div>
                                 </button>
-                            </div>  -->
-                        </div>
+                            </div>
+                            </div> -->
                     </div>
                 </main>
 
@@ -190,29 +195,29 @@
     <!-- <script src="./TW-ELEMENTS-PATH/dist/js/index.min.js"></script>
     <script src="js/main.js"></script> -->
     <script>
-        const btnSwitch = document.querySelector('#switch');
+        // const btnSwitch = document.querySelector('#switch');
 
-        btnSwitch.addEventListener('click', () => {
-            document.body.classList.toggle('dark');
-            btnSwitch.classList.toggle('active');
+        // btnSwitch.addEventListener('click', () => {
+        //     document.body.classList.toggle('dark');
+        //     btnSwitch.classList.toggle('active');
 
-            // guardamos el modo en localStorage
-            if (document.body.classList.contains('dark')) {
-                localStorage.setItem('dark-Mode', 'true');
-            } else {
-                localStorage.setItem('dark-Mode', 'false');
-            }
-        });
+        //     // guardamos el modo en localStorage
+        //     if (document.body.classList.contains('dark')) {
+        //         localStorage.setItem('dark-Mode', 'true');
+        //     } else {
+        //         localStorage.setItem('dark-Mode', 'false');
+        //     }
+        // });
 
-        // obtenemos el modo actual
-        if (localStorage.getItem('dark-Mode') === 'true') {
-            document.body.classList.add('dark');
-            btnSwitch.classList.add('active');
-        } else {
-            document.body.classList.remove('dark');
-            btnSwitch.classList.remove('active');
+        // // obtenemos el modo actual
+        // if (localStorage.getItem('dark-Mode') === 'true') {
+        //     document.body.classList.add('dark');
+        //     btnSwitch.classList.add('active');
+        // } else {
+        //     document.body.classList.remove('dark');
+        //     btnSwitch.classList.remove('active');
 
-        }
+        // }
     </script>
 
 </body>

@@ -12,9 +12,11 @@ class LiveModal extends Component
     public $modalAction;
     public $modalTitle;
     public $modalButton;
+    public $modelo, $modo;
 
     // campos
     public $item;
+    public $name, $checkit;
     // escuchas
     protected $listeners = [
         'fncCargaModal',
@@ -22,20 +24,26 @@ class LiveModal extends Component
 
     public function __construct()
     {
-        // dd($muestraModal, $modalAction, $title, $modalButton);
-        // $muestraModal = $this::$contModal == 0 ? false : true;
+        //
     }
 
     public function render()
     {
         return view('livewire.live-modal');
     }
-    public function fncCargaModal($item, string  $modalTitle = 'Título del Modal.', string  $modalButton = 'Botón2', array  $modalAction = [])
+
+    public function fncCargaModal($item, string  $modalTitle = 'Título del Modal.', string  $modalButton = 'Botón Modal', array  $modalAction = [])
     {
-        if ($item)
-            $this->item = $item;
+        if (isset($item->id))
+            $this->item = [
+                'name' => $item->name,
+                'checkit' => []
+            ];
         else
-            $this->item = ['name' => ''];
+            $this->item = [
+                'name' => '',
+                'checkit' => []
+            ];
 
         $this->modalAction = $modalAction;
         $this->modalButton = $modalButton;

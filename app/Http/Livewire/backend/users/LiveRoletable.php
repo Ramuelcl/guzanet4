@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Session;
+use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -66,17 +66,18 @@ class LiveRoletable extends Component
     ];
 
     /** campos del formulario */
-    public $item = [];
+    public $item;
     protected $items1 = null;
     protected $items2 = null;
+    public $name, $checkit;
 
     // orden y filtro
-    public $sortField1 = 'name', $sortDir1 = 'asc';
+    public $sortField1 = 'name', $sortDir1 = true;
     public $sortField2 = 'name', $sortDir2 = 'asc';
     // campos por los cuales ordenar
-    public $fieldsOrden = array('name');
-
-    public $nameOrden = array('Nombre');
+    public $fieldsOrden = array('id', 'name');
+    public $orden, $uppercase, $cursorPointer;
+    public $nameOrden = array('id', 'Nombre');
 
     public $wmViews = 5;
     public $collectionViews = array('5', '10', '25', '50',); //'all'
@@ -96,6 +97,7 @@ class LiveRoletable extends Component
 
     // elemento role
     public $bRole = true;
+    public $roleActivo;
 
     // elemento activo
     public $bActive;
@@ -120,16 +122,16 @@ class LiveRoletable extends Component
         'updatingSearch',
         'closeModal',
         'DeleteConfirm' => 'Destroy',
-        'render',
+        'render' => '$refresh',
         'fncStoreRole'
         // 'roleUpdating' => 'render',
     ];
 
-    protected $queryString = [
-        'search' => ['except' => ''],
-        'sortField1' => ['except' => 'id'],
-        'sortDir1' => ['except' => 'desc'],
-    ];
+    // protected $queryString = [
+    //     'search' => ['except' => ''],
+    //     'sortField1' => ['except' => 'id'],
+    //     'sortDir1' => ['except' => 'desc'],
+    // ];
 
     public function __construct()
     {
@@ -138,12 +140,16 @@ class LiveRoletable extends Component
         $this->bChk = false;
         if ($this->bSearch)
             $this->emitTo('live-search', 'fncSearchFields', $this->nameOrden);
+        $this->roleActivo = Role::all()
+            ->first();
+        // dd($this->roleActivo);
     }
 
     public function render()
     {
         $this->updatedQuery();
         // dd($this->items1);
+
         return view('livewire.backend.users.live-roletable', [
             'roles' => $this->items1,
             'permisos' => $this->items2,
@@ -152,39 +158,40 @@ class LiveRoletable extends Component
 
     public function updatedQuery()
     {
-        $collection = Role::where('id', '>', '0')->get();
-
-        $collection = $collection->when($this->search, function ($query) {
-            $srch = "%$this->search%";
-            return $query->Where('name', 'like', $srch);
-        });
-        $collection = $collection->when($this->sortField1 || $this->sortDir1, function ($query) {
-            // return $query->orderBy($this->sortField1, $this->sortDir1);
-        });
-        // dd($collection);
-
-        $collection = $collection->each(function ($role) {
+        $this->items1 = Role::where('name', 'like', '%' . $this->search . '%')
+            ->orderBy('name', $this->sortDir1 ? 'asc' : 'desc')
+            ->get();
+        $this->items1 = $this->items1->each(function ($role) {
             $role->count_user = User::role($role->id)->count();
         });
-        $this->items1 = $collection;
+        // $collection = Role::where('id', '>', '0')->get();
 
-        $this->items2 = Permission::where('id', '>', 0)
-            ->when($this->search, function ($query) {
-                $srch = "%$this->search%";
-                // dd($srch);
-                return $query->where('name', 'like', $srch);
-            })
+        // $collection = $collection->when($this->search, function ($query) {
+        //     $srch = "%$this->search%";
+        //     return $query->Where('name', 'like', $srch);
+        // });
+        // $collection = $collection->when($this->sortField1 || $this->sortDir1, function ($query) {
+        //     // return $query->orderBy($this->sortField1, $this->sortDir1);
+        // });
+        // // dd($collection);
 
-            ->when($this->sortField2 || $this->sortDir2, function ($query) {
-                return $query->orderBy($this->sortField2, $this->sortDir2);
-            });
+        // $collection = $collection->each(function ($role) {
+        //     $role->count_user = User::role($role->id)->count();
+        // });
+        // $this->items1 = $collection;
+
+        $this->items2 = $this->roleActivo->permissions();
+
+        //     ->when($this->sortField2 || $this->sortDir2, function ($query) {
+        //         return $query->orderBy($this->sortField2, $this->sortDir2);
+        //     });
 
         // if ($this->readyToLoad) {
         // $this->items1 = $this->items1->paginate($this->wmViews);
 
         // $this->items1 = $this->items1->paginate($this->wmViews);
-        $this->items2 = $this->items2->paginate($this->wmViews);
-        return;
+        // $this->items2 = $this->items2->paginate($this->wmViews);
+        // return;
     }
 
     public function load()
@@ -205,33 +212,53 @@ class LiveRoletable extends Component
             // Item::orWhere('name', 'like', "%{$this->search}%"
         }
     }
+    public function fncOrdenUpp($key, $sortField)
+    {
+        // dd($key, $field);
+        // valida el campo a ordenar; si existe le pone cursor-pointer
+        $this->orden = in_array($key, $this->fieldsOrden) ? $key : null;
+
+        $this->cursorPointer = $this->orden ? 'cursor-pointer' : '';
+        $this->uppercase = $key == $sortField ? 'uppercase font-bold' : 'capitalize';
+    }
     public function wc_Orden($sortField = 'name', $tabla)
     {
         if ($sortField == null || !in_array($sortField, $this->fieldsOrden))
             return;
         // dd($sortField, $tabla);
         if ($tabla == 'roles') {
-            if ($this->sortField1 == $sortField) {
-                $this->sortDir1 = $this->sortDir1 == 'desc' ? 'asc' : 'desc';
-            } else {
-                $this->sortField1 = $sortField;
-                $this->sortDir1 = $sortField == 'id' ? 'desc' : 'asc';
-            }
+            $this->sortDir1 ?? false;
         } else {
-            if ($this->sortField2 == $sortField) {
-                $this->sortDir2 = $this->sortDir2 == 'desc' ? 'asc' : 'desc';
-            } else {
-                $this->sortField2 = $sortField;
-                $this->sortDir2 = $sortField == 'id' ? 'desc' : 'asc';
-            }
+            $this->sortDir2 ?? false;
         }
         // $this->updatedQuery();
     }
-
-    public function wc_ItemAddEdit($item = 0)
+    public function wc_ShowPermissions(Role $role)
     {
-        $this->wc_Clear();
+        $this->roleActivo = $role;
+        $this->render();
+    }
+    public function wc_Permisos(Role $item)
+    {
+        // $this->wc_Clear();
+        // dd($item, "fncValoresDeModal");
+        $this->fncValoresDeModal($item, 'permission');
+
+        $this->emitTo('live-modal', 'fncCargaModal', $item, $this->modalTitle, $this->modalButton, $this->modalAction);
+
+        return;
+    }
+
+    public function wc_ItemAddEdit(Role $item)
+    {
         // dd($item);
+        if (isset($item->id)) { // edicion
+            $this->modo = 'edit';
+        } else { // nuevo
+
+            $this->modo = 'new';
+        }
+        $this->wc_Clear();
         $this->fncValoresDeModal($item, 'role');
 
         $this->emitTo('live-modal', 'fncCargaModal', $item, $this->modalTitle, $this->modalButton, $this->modalAction);
@@ -247,7 +274,7 @@ class LiveRoletable extends Component
         $this->resetErrorBag();
         $this->resetValidation();
         $this->resetPage();
-        $this->reset('item');
+        $this->reset('item', 'name', 'checkit');
         // $this->reset(['search', 'activeAll', 'sortField', 'sortDir', 'wmViews', 'wmUserRoles']);
         $this->emit('fncSearchClear');
     }
@@ -281,6 +308,28 @@ class LiveRoletable extends Component
     {
         $item = $item["item"];
         // dd($item, "fncStoreRole", $this->modalAction);
+        if ($this->modalAction['id']) {
+            $this->item = Role::find($this->modalAction['id']);
+            $this->item->update(['name' => $item['name']]);
+            $message = $this->display['edited'];
+        } else {
+            Role::create(['name' => $item['name'], 'guard_name' => "web"]);
+            $message = $this->display['created'];
+        }
+
+        // asigna el rol
+        // $item->assignRole($values['role']);
+
+        //
+        Session::flash('success', $message);
+        $this->emit('render');
+        $this->wc_Clear();
+    }
+
+    public function fncStorePermission($item)
+    {
+        $item = $item["item"];
+        dd($item, "fncStorePermission", $this->modalAction);
         if ($this->modalAction['id']) {
             $this->item = Role::find($this->modalAction['id']);
             $this->item->update(['name' => $item['name']]);
@@ -341,26 +390,42 @@ class LiveRoletable extends Component
      * control de formularios
      *
      * */
-    public function fncValoresDeModal($item = null, $modelo = null)
+    public function fncValoresDeModal($item, $modelo = null)
     {
+        // dd(['modo' => $this->modo, 'item' => $item, 'modelo' => $modelo]);
         switch (\Illuminate\Support\Str::lower($modelo)) {
             case 'role':
-                if ($item) { // editar
-                    $num = $item['id'];
-                    $this->modalTitle = __($this->display['edit'] . " : ") . $num;
+                if ($this->modo == 'edit') { // editar
+                    $num = $item->id;
+                    $this->modalTitle = "Role - " . __($this->display['edit'] . " # ") . $num;
                     $this->modalButton = __($this->display['update']);
 
-                    $this->modalAction = ['model' => $modelo, 'id' => $item['id'], 'item' => $item, 'action' => 'edit', 'call' => 'fncStoreRole'];
+                    $this->modalAction = ['model' => $modelo, 'id' => $num, 'item' => $item, 'action' => $this->modo, 'call' => 'fncStoreRole'];
                 } else { // nuevo
-                    $this->modalTitle = __($this->display['new']);
+                    $this->modalTitle = "Role - " . __($this->display['new']);
                     $this->modalButton = __($this->display['save']);
 
-                    $this->modalAction = ['model' => $modelo, 'id' => 0, 'item' => ['name' => ''], 'action' => 'new', 'call' => 'fncStoreRole'];
+                    $this->modalAction = ['model' => $modelo, 'id' => 0, 'item' => ['name' => ''], 'action' => $this->modo, 'call' => 'fncStoreRole'];
                 }
                 break;
 
-            case 'permissions':
-                # code...
+            case 'permission':
+                $AllPermissions = Permission::all();
+                $role = Role::findById($item['id'])->Permissions()->get();
+                $PermissionsXRole = $role->Permissions();
+                dd(['item' => $item, 'rol' => '', 'permxRol' => $PermissionsXRole, 'permisos' => $AllPermissions]);
+                if ($item) { // editar
+                    $num = $item['id'];
+                    $this->modalTitle = "Permission - " . __($this->display['edit'] . " # ") . $num;
+                    $this->modalButton = __($this->display['update']);
+
+                    $this->modalAction = ['model' => $modelo, 'id' => $item['id'], 'item' => $item, 'action' => $this->modo, 'call' => 'fncStorePermission'];
+                } else { // nuevo
+                    $this->modalTitle = "Permission - " . __($this->display['new']);
+                    $this->modalButton = __($this->display['save']);
+
+                    $this->modalAction = ['model' => $modelo, 'id' => 0, 'item' => ['name' => ''], 'action' => $this->modo, 'call' => 'fncStorePermission'];
+                }
                 break;
 
             default:

@@ -1,29 +1,27 @@
 <?php
 
-namespace App\View\Components\forms;
+namespace App\Http\Livewire\Forms;
 
-use Closure;
-use Illuminate\Contracts\View\View;
-use Illuminate\View\Component;
+use Livewire\Component;
 
-class input extends Component
+class LiveInput extends Component
 {
-    public $type, $idName, $value, $label, $placeholder, $icono = [], $ico = null, $lenIco = 0, $accionBoton;
+    public $type, $idName, $value, $label, $placeholder, $icono = [], $ico = null, $lenIco = 0;
 
-    /**
-     * Create a new component instance.
-     *
-     * @return void
-     */
-    public function __construct(string $idName, string  $type = 'text', string $value = '', string $label = '', string $placeholder = '', $icono = [])
+    // public function render()
+    // {
+    //     return view('livewire.forms.live-input');
+    // }
+
+    public function mount(string $idName, string  $type = 'text', string $label = '', string $placeholder = '', $icono = [])
     {
         $this->idName = $idName;
-        $this->$value  = $value;
         $this->type = $type;
         $this->label = $label;
         $this->placeholder = $placeholder;
         // $this->icono = $icono;
-        $this->ico = $this->lenIco = sizeof($icono);
+        $this->lenIco = sizeof($icono);
+        $this->ico = is_array($icono);
         if ($this->lenIco == 1) {
             $this->icono[0] = $this->fnc_Icono($icono[0]);
             $this->icono[1] = $this->fnc_Icono($icono[0]);
@@ -31,40 +29,18 @@ class input extends Component
             $this->icono[0] = $this->fnc_Icono($icono[0]);
             $this->icono[1] = $this->fnc_Icono($icono[1]);
         }
-        // if ($this->icono)
-        //     $this->ico = true;
-        // dd(['ico' => $this->ico, 'icono' => $this->icono], "111");
-    }
-    // public function mount(string $idName, string  $type = 'text', string $value = '', string $label = '', string $placeholder = '', $icono = [])
-    // {
-    //     $this->idName = $idName;
-    //     $this->$value  = $value;
-    //     $this->type = $type;
-    //     $this->label = $label;
-    //     $this->placeholder = $placeholder;
-    //     $this->icono = $icono;
-    //     if ($this->icono)
-    //         $this->ico = true;
-    //     // dd(['ico' => $this->ico, 'icono' => $this->icono], "222");
-    // }
-    /**
-     * Get the view / contents that represent the component.
-     */
-    public function render(): View|Closure|string
-    {
-        return view('components.forms.input');
     }
 
-    public function fnc_UpdateIcono()
+    public function wc_cambiaEstado()
     {
-        if (!is_null($this->ico) && $this->lenIco > 1) {
-            if ($this->ico)
-                $this->ico = false;
-            else
-                $this->ico = true;
+        // dd(['type' => $this->type]);
+        if ($this->type == 'password') {
+            $this->type = 'text';
+        } else {
+            $this->type = 'password';
         }
+        // $this->render();
     }
-
     public function fnc_Icono(string $nombre): string
     {
         switch ($nombre) {

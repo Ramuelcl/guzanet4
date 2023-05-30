@@ -286,7 +286,8 @@ class LiveUsertable extends Component
 
         $this->fncModal(2);
     }
-    public function DeleteUser(Item $item)
+
+    public function wc_borrarUsuario(Item $item)
     {
         // dd($this->item);
         if ($item->id > 2) {

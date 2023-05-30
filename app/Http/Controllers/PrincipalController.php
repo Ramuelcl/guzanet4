@@ -25,4 +25,9 @@ class PrincipalController extends Controller
     {
         return view('components.principal.porDefinir');
     }
+
+    public function testInput()
+    {
+        return view('testInput');
+    }
 }
