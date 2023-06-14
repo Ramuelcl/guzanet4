@@ -27,9 +27,10 @@ class Perfil extends Model
     protected $casts = [
         'user_id' => 'integer',
         'edad' => 'integer',
+        'id_profesion' => 'integer',
     ];
 
-    public function user(): HasOne
+    public function user1(): HasOne
     {
         return $this->hasOne(\App\Models\User::class);
     }

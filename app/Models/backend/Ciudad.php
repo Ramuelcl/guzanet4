@@ -4,6 +4,7 @@ namespace App\Models\backend;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ciudad extends Model
 {
@@ -17,14 +18,11 @@ class Ciudad extends Model
     public $timestamps = false;
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'nombre',
-        'pais_id',
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be cast to native types.
@@ -36,12 +34,12 @@ class Ciudad extends Model
         'pais_id' => 'integer',
     ];
 
-    public function direcciones()
+    public function direcciones(): BelongsTo
     {
         return $this->belongsTo(Direccion::class);
     }
 
-    public function pais()
+    public function pais(): BelongsTo
     {
         return $this->belongsTo(Pais::class);
     }

@@ -29,16 +29,16 @@ class Categoria extends Model
 
     public function posts(): MorphToMany
     {
-        return $this->morphedByMany(\App\Models\posts\Post::class, 'categoriaable');
+        return $this->morphedByMany(Post::class, 'categoriaable');
     }
 
     public function videos(): MorphToMany
     {
-        return $this->morphedByMany(\App\Models\posts\Video::class, 'categoriaable');
+        return $this->morphedByMany(Video::class, 'categoriaable');
     }
 
     public function imagens(): MorphToMany
     {
-        return $this->morphedByMany(\App\Models\posts\Imagen::class, 'categoriaable');
+        return $this->morphedByMany(Imagen::class, 'categoriaable');
     }
 }

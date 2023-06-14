@@ -27,10 +27,9 @@ class UserSetting extends Model
     protected $casts = [
         'user_id' => 'integer',
         'autologin' => 'boolean',
-        'options' => 'array',
     ];
 
-    public function userOne(): HasOne
+    public function user1(): HasOne
     {
         return $this->hasOne(\App\Models\User::class);
     }

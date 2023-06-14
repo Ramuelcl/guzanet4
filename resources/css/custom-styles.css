@@ -1,0 +1,26 @@
+/* custom-styles.css */
+
+.submenu {
+    background-color: #f7f7f7;
+    padding: 1rem;
+    border: 1px solid #ccc;
+}
+
+.menu-selected {
+    background-color: #3119cc;
+    color: #000;
+    /* Agrega cualquier otro estilo que desees para el menú seleccionado */
+}
+
+.menu-selected a {
+    /* Estilos para los enlaces dentro del menú seleccionado */
+    color: #a14646;
+    /* Agrega cualquier otro estilo que desees para los enlaces */
+}
+
+/* Estilos CSS adicionales para la línea */
+.menu-line {
+    height: 2px;
+    background-color: blue;
+    display: block;
+}

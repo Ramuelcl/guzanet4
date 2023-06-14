@@ -4,20 +4,18 @@ namespace App\Models\backend;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Telefono extends Model
 {
     use HasFactory;
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'tipo',
-        'numero',
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be cast to native types.
@@ -28,8 +26,13 @@ class Telefono extends Model
         'id' => 'integer',
     ];
 
-    public function entidads()
+    public function xClientes(): MorphToMany
     {
-        return $this->belongsToMany(Entidad::class, 'xEntidades');
+        return $this->morphedByMany(Cliente::class, 'telefonoable');
+    }
+
+    public function xVendedors(): MorphToMany
+    {
+        return $this->morphedByMany(\App\Models\compras\Vendedor::class, 'telefonoable');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\mdlData;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Concerns\ToModel;

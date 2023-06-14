@@ -26,20 +26,26 @@ class Marcador extends Model
     protected $casts = [
         'id' => 'integer',
         'metadata' => 'array',
+        'isActive' => 'boolean',
     ];
 
-    public function postIndices(): MorphToMany
+    public function xPosts(): MorphToMany
     {
-        return $this->morphedByMany(\App\Models\posts\Post::class, 'marcadorable');
+        return $this->morphedByMany(Post::class, 'marcadorable');
     }
 
-    public function videoIndices(): MorphToMany
+    public function xVideos(): MorphToMany
     {
-        return $this->morphedByMany(\App\Models\posts\Video::class, 'marcadorable');
+        return $this->morphedByMany(Video::class, 'marcadorable');
     }
 
-    public function imagenIndices(): MorphToMany
+    public function xImagens(): MorphToMany
     {
-        return $this->morphedByMany(\App\Models\posts\Imagen::class, 'marcadorable');
+        return $this->morphedByMany(Imagen::class, 'marcadorable');
+    }
+
+    public function xMovimientos(): MorphToMany
+    {
+        return $this->morphedByMany(Movimiento::class, 'marcadorable');
     }
 }

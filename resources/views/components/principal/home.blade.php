@@ -4,5 +4,6 @@
         {{ __('Welcome') }}
     </x-slot>
     <h1 class="mt-5">Bienvenidos</h1>
+    <livewire:forms.menu-component />
     </div>
 </x-app-layout>

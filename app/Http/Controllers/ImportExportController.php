@@ -22,7 +22,7 @@ class ImportExportController extends Controller
     public function import()
     {
         try {
-            Excel::import(new \App\Imports\ImportDatos, request()->file('file'));
+            Excel::import(new \App\Imports\ImportBanca, request()->file('file'));
             //$paso = // dd($paso);
         } catch (\Exception $e) {
             // Woopsy

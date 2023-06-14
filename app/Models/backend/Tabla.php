@@ -25,7 +25,7 @@ class Tabla extends Model
     protected $casts = [
         'tabla' => 'integer',
         'tabla_id' => 'integer',
-        'activo' => 'boolean',
+        'isActive' => 'boolean',
         'valor1' => 'decimal:2',
         'valor3' => 'boolean',
     ];
