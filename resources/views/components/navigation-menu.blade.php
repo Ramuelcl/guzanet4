@@ -21,8 +21,7 @@
                 <!-- Navigation Links -->
 
                 <div class="h-80 hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <livewire:forms.menu-component />
-
+                    @livewire('forms.menu-component', ['orientation' => true])
                 </div>
 
             </div>
@@ -196,20 +195,7 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            {{-- <livewire:forms.menu-component /> --}}
-            {{-- @foreach ($menus as $menu)
-                @if ($menu['role'] == 'guest')
-                    <x-responsive-nav-link href="{{ route($menu['route']) }}" :active="request()->routeIs($menu['active'])">
-                        {{ __($menu['title']) }}
-                    </x-responsive-nav-link>
-                @else
-                    @role($menu['role'])
-                        <x-responsive-nav-link href="{{ route($menu['route']) }}" :active="request()->routeIs($menu['active'])">
-                            {{ __($menu['title']) }}
-                        </x-responsive-nav-link>
-                    @endrole
-                @endif
-            @endforeach --}}
+            @livewire('forms.menu-component', ['orientation' => true])
         </div>
 
         <!-- Responsive Settings Options -->

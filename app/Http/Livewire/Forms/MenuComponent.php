@@ -11,18 +11,25 @@ class MenuComponent extends Component
 {
     public $menus;
     public $selectedMenuId;
+    public $orientation = false; // vertical=false; horizontal=true
 
-    public function mount()
+    public function mount($orientation = false)
     {
         $this->menus = Menu::whereNull('parent_id')
             ->where('isActive', true)
             ->with('children')
             ->get();
+        $this->toggleOrientation($orientation);
     }
 
     public function render()
     {
         return view('livewire.forms.menu-component');
+    }
+
+    public function toggleOrientation($orientation)
+    {
+        $this->orientation = $orientation;
     }
 
     public function isActiveMenu($url)

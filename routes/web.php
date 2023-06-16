@@ -18,12 +18,10 @@ Route::get('/', function () {
 Route::get('/register', \App\Http\Livewire\register::class);
 // Route::get('/register', \App\Http\Livewire\register::class)->layout('layouts.base');
 
-Route::controller(ImportExportController::class)->group(function () {
-    Route::get('import_export', 'importExport');
-    Route::post('import', 'import')->name('import');
-    Route::get('export', 'export')->name('export');
+Route::group(['prefix' => 'banca'], function () {
+    Route::get('/import', [ImportExportController::class, 'showImportForm'])->name('banca.import.form');
+    Route::post('/import-traspaso-bancas', [ImportExportController::class, 'import'])->name('import.traspaso.bancas');
 });
-
 
 Route::controller(PrincipalController::class)
     ->prefix('')
@@ -43,10 +41,18 @@ Route::controller(PrincipalController::class)
     });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('user/list', [UserController::class, 'indexUsers'])->name('user.list')->middleware('guzanet4:admin|user');
-    Route::get('role/list', [UserController::class, 'indexRoles'])->name('role.list')->middleware('guzanet4:admin');
-    Route::view('seller/list', 'seller.list')->name('seller.list')->middleware('guzanet4:admin|seller');
-    Route::view('client/list', 'client.list')->name('client.list')->middleware('guzanet4:admin|client');
+    Route::get('user/list', [UserController::class, 'indexUsers'])
+        ->name('user.list')
+        ->middleware('guzanet4:admin|user');
+    Route::get('role/list', [UserController::class, 'indexRoles'])
+        ->name('role.list')
+        ->middleware('guzanet4:admin');
+    Route::view('seller/list', 'seller.list')
+        ->name('seller.list')
+        ->middleware('guzanet4:admin|seller');
+    Route::view('client/list', 'client.list')
+        ->name('client.list')
+        ->middleware('guzanet4:admin|client');
 });
 
 // Route::group(['middleware' => ['auth']], function () {
@@ -55,11 +61,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 //     })->name('users');
 // });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified'
-])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');

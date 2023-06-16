@@ -1,17 +1,18 @@
 <!-- resources/views/livewire/menu-component.blade.php -->
 
 <div class="ml-4 mt-4 text-blue-500 relative">
-    <ul class="flex space-x-6 space-y-2">
+    <ul class="{{ $orientation ? 'flex space-x-4' : 'space-y-2' }}">
 
         @foreach ($menus as $menu)
             <li x-data="{ open: false }" @mouseover="open = true" @mouseleave="open = false">
                 @if ($menu->url)
-                    <x-nav-link :href="$menu->url" :active="request()->is($menu->url)" class="flex items-center py-2 px-4">
-                        @if ($menu->icono)
-                            <span class="mr-2">
-                                <i class="{{ $menu->icono }}"></i>
-                            </span>
-                        @endif
+                    <x-nav-link :href="$menu->url" :active="request()->is($menu->url)"
+                        class="{{ $orientation ? 'flex items-center' : '' }}">
+                        <svg class="h-5 w-5 mr-2">
+                            <use
+                                xlink:href="{{ asset('storage/images/heroicons/solid/' . $menu->icon . '.svg#' . $menu->icon) }}">
+                            </use>
+                        </svg>
                         <span>{{ $menu->nombre }}</span>
                     </x-nav-link>
                 @else

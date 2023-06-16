@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class TraspasoBanca extends Model
 {
     use HasFactory;
+    protected $table = 'traspaso_bancas';
 
     /**
      * Indicates if the model should be timestamped.
@@ -15,6 +16,16 @@ class TraspasoBanca extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    protected $fillable = [
+        'Date',
+        'Libelle',
+        'MontantEUROS',
+        'MontantFRANCS',
+        'NomArchTras',
+        'IdArchMov',
+        // Agrega aquí los demás campos de tu tabla
+    ];
 
     /**
      * The attributes that aren't mass assignable.
@@ -30,9 +41,11 @@ class TraspasoBanca extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'Date' => 'timestamp',
-        'MontantEUROS' => 'decimal:2',
-        'MontantFRANCS' => 'decimal:2',
-        'archMov' => 'integer',
+        'Date' => 'string',
+        'Libelle' => 'string',
+        'MontantEUROS' => 'string',
+        'MontantFRANCS' => 'string',
+        'NomArchTras' => 'string',
+        'IdArchMov' => 'integer',
     ];
 }
