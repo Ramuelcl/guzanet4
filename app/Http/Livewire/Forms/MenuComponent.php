@@ -12,6 +12,7 @@ class MenuComponent extends Component
     public $menus;
     public $selectedMenuId;
     public $orientation = false; // vertical=false; horizontal=true
+    public $currentLocale;
 
     public function mount($orientation = false)
     {
@@ -53,5 +54,12 @@ class MenuComponent extends Component
     public function closeSubMenu()
     {
         $this->selectedMenuId = null;
+    }
+
+    public function selectLangue($langue = '/greeting/fr')
+    {
+        // dd($langue);
+        $currentLocale = session('locale') === substr($langue, -2);
+        return $currentLocale;
     }
 }

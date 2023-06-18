@@ -4,45 +4,123 @@ namespace App\Http\Controllers;
 
 use App\Imports\TraspasoBancaImport;
 use App\Models\banca\TraspasoBanca;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-use Maatwebsite\Excel\Facades\Excel;
+// use Maatwebsite\Excel\Facades\Excel;
 
 class ImportExportController extends Controller
 {
     public function showImportForm()
     {
-        return view('banca.import');
+        $titulos = [
+            'id',
+            'Date',
+            'Libelle',
+            'EURES',
+            'FRANCS',
+            'archivo traspaso',
+            '# movimiento'
+        ];
+
+        $campos = [
+            'id',
+            'Date',
+            'Libelle',
+            'MontantEURES',
+            'MontantFRANCS',
+            'NomArchTras',
+            'IdArchMov'
+        ];
+        $totalImportados = TraspasoBanca::count();
+        $totalMovimientos = TraspasoBanca::whereNotNull('IdArchMov')->count();
+
+        $registrosDuplicados = DB::table('traspaso_bancas')
+            ->select(DB::raw("GROUP_CONCAT(CONCAT(Date, Libelle, MontantEUROS) SEPARATOR ', ') AS concat"))
+            ->groupBy('Date', 'Libelle', 'MontantEUROS')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        $totalDuplicados = $registrosDuplicados->count();
+
+        $data = TraspasoBanca::where('id', '>', '0')->get();
+
+        return view('banca.import', ['data' => $data,  'titulos' => $titulos, 'campos' => $campos, 'totalImportados' => $totalImportados, 'totalMovimientos' => $totalMovimientos, 'totalDuplicados' => $totalDuplicados]);
     }
 
     public function import(Request $request)
     {
-        $separadorCampos = $request->input('separador_campos');
-        $caracterString = $request->input('caracter_string');
-        $saltosLinea = $request->input('saltos_linea');
-        $lineaDatos = $request->input('linea_datos');
+        // dd($request);
 
-        $archivo = $request->file('archivo');
+        // Validar el archivo enviado por el formulario
+        $request->validate([
+            'archivo' => 'required|array',
+            'archivo.*' => 'mimes:csv,txt,tsv|max:2048',
+        ]);
 
-        $extension = $archivo->getClientOriginalExtension();
-        $nombreOriginal = $archivo->getClientOriginalName();
+        $cnfTraspaso = [
+            'separadorCampos' => $request->input('separador_campos'),
+            'caracterString' => $request->input('caracter_string'),
+            'finLinea' => $request->input('fin_linea'),
+            'lineaEncabezados' => $request->input('linea_encabezados'),
+        ];
+        // Obtener los archivos enviados desde el formulario
+        $archivos = $request->file('archivo');
+        foreach ($archivos as $archivo) {
 
-        if ($this->checkFileImported($nombreOriginal)) {
-            // El archivo ya ha sido importado, realiza alguna acción (por ejemplo, mostrar un mensaje de error)
-            return redirect()->back()->with('error', 'El archivo ya ha sido importado');
-        } else {
-            // Procede con la importación del archivo
+            // Obtener el nombre original del archivo
+            $nombreOriginal = $archivo->getClientOriginalName();
+            $extension = $archivo->getClientOriginalExtension();
 
-            try {
-                // Importar el archivo
-                $import = new TraspasoBancaImport($separadorCampos, $caracterString, $saltosLinea, $lineaDatos, $nombreOriginal, $extension);
-                Excel::import($import, $archivo);
+            // dd($archivo, $nombreOriginal, $extension);
 
-                return redirect()->back()->with('success', 'El archivo se ha importado correctamente.');
-            } catch (\Exception $e) {
-                return redirect()->back()->with('error', 'Ha ocurrido un error al importar el archivo: ' . $e->getMessage());
+            // Verificar si el archivo ya ha sido importado
+            if ($this->checkFileImported($nombreOriginal)) {
+                // dump(['Archivo ya traspasado: ' => $archivo]);
+                Session::flash('success', "Archivo ya traspasado: $archivo");
+            } else {
+                // Procede con la importación del archivo
+                try {
+                    // Determinar los campos y columnas correspondientes según la extensión del archivo
+                    $camposTabla = [
+                        'Date',
+                        'Libelle',
+                        'MontantEUROS',
+                        'MontantFRANCS',
+                        'NomArchTras'
+                        // 'Date' => 'date',
+                        // 'Libelle' => 'text',
+                        // 'MontantEUROS' => 'decimal,2',
+                        // 'MontantFRANCS' => 'decimal,2',
+                        // 'NomArchTras'
+                    ];
+
+                    // Columnas del archivo
+                    $camposArchivo = [
+                        'Date',
+                        'Libelle',
+                        'MontantEUROS',
+                        'MontantFRANCS',
+                    ];
+                    // dd(['camposTabla' => $camposTabla, 'camposArchivo' => $camposArchivo]);
+
+                    // Crear una instancia de TraspasoBancaImport con los parámetros necesarios
+                    $importador = new TraspasoBancaImport($nombreOriginal, $cnfTraspaso, $camposTabla, $camposArchivo);
+                    // Importar los datos del archivo
+                    // dd(['archivo' => $archivo]);
+                    $importador->import($archivo);
+                    // dd(['importador' => $importador]);
+
+                    // Redireccionar o mostrar un mensaje de éxito
+                    Session::flash('success', "El archivo ($nombreOriginal) se ha importado.");
+                } catch (\Exception $e) {
+                    // dd($archivo, $e->getMessage());
+                    Session::flash('error', 'Ha ocurrido un error al importar el archivo: ' . $e->getMessage());
+                }
             }
         }
+        return redirect()->back();
     }
 
     public function checkFileImported($nombreArchivo)
@@ -54,5 +132,21 @@ class ImportExportController extends Controller
         }
 
         return $count > 0;
+    }
+
+    public function eliminarRegistrosDuplicados()
+    {
+        $registrosDuplicados = TraspasoBanca::selectRaw('MIN(id) as min_id, CONCAT(Date, Libelle, MontantEUROS, MontantFRANCS) as concatFields')
+            ->groupBy('Date', 'Libelle', 'MontantEUROS', 'MontantFRANCS')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        foreach ($registrosDuplicados as $registro) {
+            TraspasoBanca::where('id', '<>', $registro->min_id)
+                ->whereRaw('CONCAT(Date, Libelle, MontantEUROS, MontantFRANCS) = ?', [$registro->concatFields])
+                ->delete();
+        }
+
+        return redirect()->back()->with('success', 'Registros duplicados eliminados correctamente');
     }
 }

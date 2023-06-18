@@ -3,148 +3,166 @@
 namespace App\Imports;
 
 use App\Models\banca\TraspasoBanca;
-//
-use Illuminate\Database\QueryException;
+use App\Imports\clsFileReader;
+
+use DateTime;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-//
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Imports\HeadingRowFormatter;
-use Maatwebsite\Excel\Concerns\WithStartRow;
 
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
-
-use Maatwebsite\Excel\Concerns\FromCollection;
-
-
-class TraspasoBancaImport implements ToModel, WithHeadingRow, WithStartRow
+class TraspasoBancaImport extends clsFileReader
 {
+    public $fileReader;
 
-    protected $separadorCampos;
-    protected $caracterString;
-    protected $saltosLinea;
-    protected $lineaDatos;
-    protected $nombreOriginal;
-    protected $tipoArchivo;
-    //
-    public static $titulos = 48;
-    public static $fila = 0;
-    public static $columnas;
+    public $nombreOriginal;
 
-    public function __construct($separadorCampos, $caracterString, $saltosLinea, $lineaDatos, $nombreOriginal, $tipoArchivo)
+    public $camposTabla;
+    public $camposArchivo;
+    public $cnfTraspaso;
+
+    public function __construct($nombreArchivo, $cnfTraspaso, $camposTabla, $camposArchivo)
     {
-        $this->separadorCampos = $separadorCampos;
-        $this->caracterString = $caracterString;
-        $this->saltosLinea = $saltosLinea;
-        $this->lineaDatos = $lineaDatos;
-        $this->nombreOriginal = $nombreOriginal;
-        $this->tipoArchivo = $tipoArchivo;
 
-        $this->getCsvSettings();
+        // Crear una instancia de clsFileReader y configurar opciones personalizadas
+        $this->fileReader = new clsFileReader($nombreArchivo);
+
+        $this->fileReader->setConfig($cnfTraspaso);
+
+        $this->nombreOriginal = $nombreArchivo;
+        $this->camposTabla = $camposTabla;
+        $this->camposArchivo = $camposArchivo;
+        // dd(['fileReader' => $this->fileReader]);
     }
 
-    public function model(array $row)
+    public function import($file)
     {
-        if (self::$fila === 0) {
-            $this->createTablaTraspasos();
-            $this->headingRow($row);
-            self::$fila++;
-            return [];
+        $this->createTablaTraspasos();
+        $asArray = true;
+        // Leer el archivo línea por línea
+        $this->fileReader->open($file);
+
+        // dd('llegó import');
+        $lineas = 0;
+        while (($line = $this->fileReader->readLines($asArray)) !== false) {
+            // Obtener datos de la línea actual
+            // dump([$line, 'lineas' => $lineas, 'encabezado empieza=' => $this->fileReader->letLineaEncabezado()]);
+            $lineas++;
+            if ($lineas <= $this->fileReader->letLineaEncabezado()) {
+                continue;
+            }
+
+            // dd("leyo lineas");
+
+            // recupera la linea particionada en un arreglo
+            $row = $this->fileReader->parseLine($line, $this->camposArchivo); //para ser asociativos, asigno nombres
+            // dump(["parseado" => $row]);
+
+            // Asociar campos de la tabla con las columnas del archivo
+            $rowFormat = [];
+
+            foreach ($this->camposTabla as $columnaTabla => $campoTabla) {
+                // dump(is_numeric($columnaTabla), $campoTabla);
+
+                if (!is_numeric($columnaTabla)) {
+                    $tipo = $campoTabla;
+                    $ind = $columnaTabla;
+                } else {
+                    $tipo = null;
+                    $ind = $campoTabla;
+                }
+
+                if (array_key_exists($ind, $row)) {
+                    $rowFormat[$ind] = $this->fncTransfiereDato($row[$ind], $tipo);
+                } else {
+                    $rowFormat[$ind] = 0;
+                    // La columna no existe en el archivo, puedes manejar el caso aquí
+                    // por ejemplo, asignar un valor predeterminado o lanzar una excepción
+                }
+
+                // dd(['indice' => $ind, 'tabla format' => $rowFormat[$ind],  'tipo' => $tipo]);
+            }
+
+            // dd(["pasado con valores" => $rowFormat]);
+
+            // Crear una nueva instancia del modelo y guardar en la base de datos
+            $modelo = new TraspasoBanca($rowFormat);
+            $modelo->NomArchTras = $this->nombreOriginal;
+            $modelo->save();
+            // dump("crea registro");
         }
 
-        $row[1] = ',' . $row[1];
-        $row[2] = ',' . $row[2];
-        $row = implode('', $row);
-        $row = fncCambiaCaracteresEspeciales($row);
-        $row = explode($this->separadorCampos, $row);
-        // dd($row);
-        // Realiza la conversión de codificación de los caracteres
-
-        // sleep(10);
-        // dd(['row' => $row, 'columnas' => self::$columnas, 'fila' => self::$fila]);
-        // Obtener los valores de cada columna utilizando los títulos convertidos
-        $date = $row[0];
-        $libelle = trim(str_replace('"', '', $row[1]));
-        // $libelle = trim(str_replace('"', '', $libelle));
-        $montantEUROS = $row[2];
-        $montantFRANCS = $row[3];
-        dump(['date' => $date, 'Libelle' => $libelle, 'MontantEUROS' => $montantEUROS, 'MontantFRANCS' => $montantFRANCS, 'NomArchTras' => $this->nombreOriginal, 'fila' => self::$fila]);
-        // Crear el modelo TraspasoBanca con los valores obtenidos
-        self::$fila++;
-        $Traspaso = new TraspasoBanca([
-            'Date' => $date,
-            'Libelle' => $libelle,
-            'MontantEUROS' => $montantEUROS,
-            'MontantFRANCS' => $montantFRANCS,
-            'NomArchTras' => $this->nombreOriginal
-        ]);
-        $Traspaso->save();
-        // dd($Traspaso);   
-        return $Traspaso;
+        $this->fileReader->close();
     }
 
-    public function getCsvSettings(): array
+    private function fncTransfiereDato($valor, $tipoDato = 0)
     {
-        // dump([
-        //     'delimiter' => $this->separadorCampos,
-        //     'lineEnding' => $this->saltosLinea,
-        //     'eol' => $this->saltosLinea,
-        //     'enclosure' => $this->caracterString,
-        //     'input_encoding' => $this->tipoArchivo,
-        //     'start_from_row' => $this->lineaDatos,
-        //     'skip_rows' => $this->lineaDatos,
-        // ]);
-        return [
-            'delimiter' => $this->separadorCampos,
-            //
-            'lineEnding' => $this->saltosLinea,
-            'eol' => $this->saltosLinea,
-            //
-            'enclosure' => $this->caracterString,
-            'input_encoding' => $this->tipoArchivo,
-            //
-            'start_from_row' => $this->lineaDatos,
-            'skip_rows' => $this->lineaDatos,
-            //
-            'encoding' => 'UTF-8',
-        ];
+        // dump(['fncTransfiereDato' => $valor, $tipoDato]);
+        if ($tipoDato === 'integer') {
+            $value            = (int) $valor;
+            // dump($value);
+            return $value;
+        } elseif ($tipoDato === 'date') {
+            $value          =  date('Y/d/m', strtotime($valor));
+            // dump($value);
+            return $value;
+        } elseif (strpos($tipoDato, 'decimal') !== false) {
+            $precision = explode(',', $tipoDato)[1] ?? 2;
+            $value          = number_format((float) $valor, $precision, '.', '');
+            // dump($value);
+            return $value;
+        } else {
+            $value          = (string) $valor;
+            // dump($value);
+            return $value;
+        }
     }
 
-    public function headingRow($row = null): int
+    // protected function castearDato($valor, $forzarTipo)
+    // {
+    //     switch ($forzarTipo) {
+    //         case 'alpha':
+    //             return ctype_alpha($valor) ? $valor : null;
+    //         case 'digit':
+    //             return ctype_digit($valor) ? $valor : null;
+    //         case 'float':
+    //             return is_numeric($valor) ? floatval($valor) : null;
+    //         case 'bool':
+    //             return filter_var($valor, FILTER_VALIDATE_BOOLEAN) ? '1' : null;
+    //         case 'date':
+    //             return $this->parsearFecha($valor);
+    //         case 'datetime':
+    //             return $this->parsearFechaHora($valor);
+    //         default:
+    //             return $valor;
+    //     }
+    // }
+
+    private function parsearFecha($valor)
     {
-        // if (!is_null($row)) {
-        //     // // Convertir los títulos de las columnas a minúsculas
-        //     self::$columnas = array_map('mb_strtolower', array_keys($row));
-        //     // dump(['row' => $row, 'columnas' => self::$columnas, 'fila' => self::$fila]);
-        //     // sleep(5);
-        // }
-        return $this->lineaDatos; // Indica que el encabezado se encuentra en la fila x
+        try {
+            $fecha = DateTime::createFromFormat('Y-m-d', $valor);
+            return $fecha->format('Y-m-d');
+        } catch (Exception $e) {
+            // Error al parsear la fecha
+            return null;
+        }
     }
 
-    public function startRow(): int
+
+    protected function parsearFechaHora($valor)
     {
-        return $this->headingRow() + 1; // Salta automáticamente a la línea después del encabezado
+        try {
+            return new DateTime($valor);
+        } catch (Exception $e) {
+            // Error al parsear la fecha
+            return null;
+        }
     }
 
-    public function headingRowFormatter(): HeadingRowFormatter
-    {
-        return new HeadingRowFormatter(function ($value) {
-            // Aplica cualquier lógica de formateo que desees
-            return strtoupper($value);
-        });
-    }
 
     public function createTablaTraspasos()
     {
         try {
-            // Verificar si la tabla existe y eliminarla si es necesario
-            // if (Schema::hasTable('traspaso_bancas')) {
-            //     DB::statement('DROP TABLE traspaso_bancas');
-            //     echo "La tabla traspaso_bancas ha sido eliminada exitosamente.<br>";
-            // }
-
             // Crear la tabla traspaso_bancas
             if (!Schema::hasTable('traspaso_bancas')) {
                 DB::statement('
@@ -158,17 +176,22 @@ class TraspasoBancaImport implements ToModel, WithHeadingRow, WithStartRow
                 IdArchMov BIGINT(10)
                 )
             ');
+                echo "La tabla traspaso_bancas ha sido creada exitosamente.<br>";
             }
-            echo "La tabla traspaso_bancas ha sido creada exitosamente.<br>";
 
             // Vaciar la tabla si tiene datos
-            // $count = DB::table('traspaso_bancas')->count();
-            // if ($count > 0) {
-            //     DB::table('traspaso_bancas')->truncate();
-            //     echo "La tabla traspaso_bancas ha sido vaciada.<br>";
-            // }
+            $count = DB::table('traspaso_bancas')->count();
+            if ($count > 0) {
+                //     DB::table('traspaso_bancas')->truncate();
+                echo "La tabla traspaso_bancas ha sido vaciada.<br>";
+            }
+            //
+            if ($count == 0) {
+                DB::statement('ALTER TABLE traspaso_bancas AUTO_INCREMENT = 1;');
+                echo "La tabla traspaso_bancas tiene el incrementador en 1.<br>";
+            }
         } catch (\Exception $e) {
-            echo "Error al crear o vaciar la tabla traspaso_bancas: " . $e->getMessage() . "<br>";
+            echo "Error al crear, vaciar o poner a 1 el AUTO_INCREMENT de la tabla traspaso_bancas: " . $e->getMessage() . "<br>";
         }
     }
 }

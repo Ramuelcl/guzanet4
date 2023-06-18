@@ -13,24 +13,43 @@
                                 xlink:href="{{ asset('storage/images/heroicons/solid/' . $menu->icon . '.svg#' . $menu->icon) }}">
                             </use>
                         </svg>
-                        <span>{{ $menu->nombre }}</span>
+                        <span>{{ fncTraduccion($menu->nombre) }}</span>
                     </x-nav-link>
                 @else
                     <span
                         class="cursor-pointer
-                            block py-2 px-4 leading-6 font-medium text-gray-900">{{ $menu->nombre }}</span>
+                            block py-2 px-4 leading-6 font-medium text-gray-900">{{ fncTraduccion($menu->nombre) }}</span>
                 @endif
-
+                {{-- <span>{{ session('locale') }}</span> --}}
                 @if ($menu->children->isNotEmpty())
-                    <ul x-show="open" class="left-0 mt-2 ml-2 bg-white shadow-md py-2 px-4">
+                    <ul x-show="open" class="left-0 mt-2 ml-2 bg-white shadow-md py-2 px-4 list-none">
                         @foreach ($menu->children as $submenu)
-                            <li>
-                                <x-nav-link
-                                    class="block py-2 px-4 leading-6 font-medium text-gray-900 hover:text-blue-600"
-                                    href="{{ $submenu->url }}">{{ $submenu->nombre }}
-                                </x-nav-link>
+                            @if (substr($submenu->url, 0, 10) == '/greeting/')
+                                @php
+                                    $isCurrentLangue = $this->selectLangue($submenu->url);
+                                    // $menuUrl = substr($submenu->url, 0, 9);
+                                @endphp
+                                {{-- <span>{{ $isCurrentLangue }}</span> --}}
+                                {{-- <span>{{ $menuUrl }}</span> <!-- Agregado para depurar --> --}}
+                                <li>
+                                    <x-nav-link
+                                        class="block py-2 px-4 leading-6 font-medium text-gray-900 hover:text-blue-600 {{ $isCurrentLangue ? 'flex items-center' : '' }}"
+                                        href="{{ $submenu->url }}">
+                                        @if ($isCurrentLangue)
+                                            <span class="mr-2 list-disc">&#8226;</span>
+                                        @endif
+                                        {{ fncTraduccion($submenu->nombre) }}
+                                    </x-nav-link>
 
-                            </li>
+                                </li>
+                            @else
+                                <li>
+                                    <x-nav-link
+                                        class="block py-2 px-4 leading-6 font-medium text-gray-900 hover:text-blue-600"
+                                        href="{{ $submenu->url }}">{{ fncTraduccion($submenu->nombre) }}
+                                    </x-nav-link>
+                                </li>
+                            @endif
                         @endforeach
                     </ul>
                 @endif

@@ -363,6 +363,15 @@ if (!function_exists('fncElimCaracterDuplicado')) {
         );
     }
 }
+if (!function_exists('fncTraduccion')) {
+    function fncTraduccion($texto_a_traducir, $locale = null)
+    {
+        if (is_null($locale))
+            $locale = session('locale');
+        $traduccion = trans($texto_a_traducir, [], $locale);
+        return $traduccion !== $texto_a_traducir ? $traduccion : $texto_a_traducir;
+    }
+}
 
 /**
  * Funcion para buscar archivo(s) en un directorio o subdirectorios

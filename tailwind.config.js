@@ -38,6 +38,9 @@ module.exports = {
             border: {
                 submenu: '1px solid #ccc',
             },
+            listStyleType: {
+                disc: 'disc',
+            },
         },
     },
 

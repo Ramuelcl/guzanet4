@@ -4,69 +4,116 @@
             {{ __('Laravel 10 Import Export CSV And EXCEL File - Techsolutionstuff') }}
         </h2>
     </x-slot>
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
 
-    @if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-    @endif
+    <x-forms.msgErrorsSession :errors="$errors" :success="session('success', [])" />
+
     <!-- Formulario de importación -->
-    <form method="POST" action="{{ route('import.traspaso.bancas') }}" enctype="multipart/form-data">
+    <div class="mx-6 my-6">
+        <form method="POST" action="{{ route('import.traspaso.bancas') }}" enctype="multipart/form-data">
+            @csrf
 
-        @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <!-- Contenido de la primera columna -->
+                    <div class="mb-4">
+                        <x-input label="Archivo:" placeholder="selecciona un archivo" type="file" name="archivo[]"
+                            id="archivo" multiple required accept=".csv, .tsv, .txt" />
+                    </div>
 
-        <div class="mb-4">
-            <x-input label="Archivo" placeholder="selecciona un archivo" type="file" name="archivo" required accept=".csv, .tsv, .txt" />
+                    <div class="mb-4">
+                        <x-native-select label="Separador de campos:" placeholder="Separador de campos"
+                            wire:model="separador_campos" name="separador_campos">
+                            <option value=",">Coma (,)</option>
+                            <option value=";" selected>Punto y coma (;)</option>
+                            <option value="\t">Tabulación(/t)</option>
+                        </x-native-select>
+                    </div>
+
+                    <div class="mb-4">
+                        <x-native-select label="Fin de línea:" placeholder="Fin de línea" wire:model="fin_linea"
+                            name="fin_linea">
+                            <option value="\n">LF (Salto de línea /n)</option>
+                            <option value="\r">CR (Retorno de carro /r)</option>
+                            <option value="\r\n" selected>CR+LF (Retorno de carro + Salto de línea /r/n)</option>
+                            <option value="\x85">NEL (Nueva línea de siguiente línea /x85)</option>
+                            <option value="\u2028">LS (Separador de línea /u2028)</option>
+                            <option value="\x0B">VT (Tabulación vertical /x0B)</option>
+                        </x-native-select>
+                    </div>
+                </div>
+
+                <div>
+                    <!-- Contenido de la segunda columna -->
+                    <div class="mb-4">
+                        <x-native-select label="Carácter para los strings:" placeholder="Carácter para los strings"
+                            wire:model="caracter_string" name="caracter_string">
+                            <option value='"' selected>Comillas dobles (")</option>
+                            <option value="'">Comillas simples (')</option>
+                        </x-native-select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="linea_encabezados">Línea encabezados:</label>
+                        <x-input type="text" name="linea_encabezados" id="linea_encabezados" required
+                            value="7" />
+                    </div>
+
+                    <div class="mb-4 flex justify-center mt-8">
+                        <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Importar CSV/TSV</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="flex divide-x-4 justify-between mx-10">
+        <div class="my-4">
+            <div class="text-center md:text-left">
+                <span class="font-bold">Total importados:</span> <span class="font-bold">{{ $totalImportados }}</span>
+            </div>
         </div>
+        <div class="my-4">
+            <div class="text-center md:text-left">
+                <span class="font-bold">Registros duplicados:</span> <span
+                    class="font-bold">{{ $totalDuplicados }}</span>
+            </div>
+            @if ($totalDuplicados)
+                <form action="{{ route('eliminar.registros.duplicados') }}" method="POST">
+                    @csrf
+                    <button type="submit"
+                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Eliminar Registros
+                        Duplicados</button>
+                </form>
+            @endif
 
-        <div class="mb-4">
-            <x-native-select label="Separador de campos" placeholder="Separador de campos" wire:model="separador_campos" name="separador_campos">
-                <option value=",">Coma (,)</option>
-                <option value=";" selected>Punto y coma (;)</option>
-                <option value="\t">Tabulación(/t)</option>
-            </x-native-select>
         </div>
-
-        <div class="mb-4">
-            <label for="saltos_linea">Saltos de línea:</label>
-            <select name="saltos_linea" id="saltos_linea" required>
-                <option value="\n">LF (Salto de línea /n)</option>
-                <option value="\r">CR (Retorno de carro /r)</option>
-                <option value="\r\n" selected>CR+LF (Retorno de carro + Salto de línea /r/n)</option>
-                <option value="\x85">NEL (Nueva línea de siguiente línea /x85)</option>
-                <option value="\u2028">LS (Separador de línea /u2028)</option>
-                <option value="\x0B">VT (Tabulación vertical /x0B)</option>
-            </select>
+        <div class="my-4">
+            <div class="text-center md:text-left">
+                <span class="font-bold">Total movimientos:</span> <span class="font-bold">{{ $totalMovimientos }}</span>
+            </div>
         </div>
+    </div>
 
-        <div class="mb-4">
-            <label for="caracter_string" class="block">Carácter para los strings</label>
-            <select id="caracter_string" name="caracter_string" class="w-full">
-                <option value='"' selected>Comillas dobles (")</option>
-                <option value="'">Comillas simples (')</option>
-            </select>
-        </div>
+    <!-- Aquí muestra la grilla de datos -->
+    @if ($data)
+        @livewire('tables.live-tabla', ['data' => $data, 'encabezado' => 'Datos Transferidos', 'titulos' => $titulos, 'campos' => $campos])
+        {{-- 'data' => $data, 'titulo' => 'Datos Transferidos', 'encabezado' => $titulos, 'campos' => $campos, 'totalImportados' => $totalImportados, 'totalMovimientos' => $totalMovimientos, 'totalDuplicados' => $totalDuplicados --}}
+    @endif
 
+    </div>
+    @push('styles')
+        <!-- Estilos específicos de la importación -->
+        {{-- @wireuiStyles --}}
+    @endpush
 
-        <div class="mb-4">
-            <label for="linea_datos">Línea donde comienzan los datos:</label>
-            <input type="text" name="linea_datos" id="linea_datos" required value="7">
-        </div>
+    @push('scripts')
+        <!-- Scripts específicos de la importación -->
+        {{-- @wireuiScripts --}}
+    @endpush
 
-        <div class="mb-4">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Importar CSV/TSV</button>
-        </div>
-    </form>
-
-
-    <!-- Formulario de exportación -->
+    @push('modals')
+        <!-- Modales específicos de la importación -->
+        <!-- Agrega aquí tus modales -->
+    @endpush
 </x-app-layout>

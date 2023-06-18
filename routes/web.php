@@ -21,7 +21,21 @@ Route::get('/register', \App\Http\Livewire\register::class);
 Route::group(['prefix' => 'banca'], function () {
     Route::get('/import', [ImportExportController::class, 'showImportForm'])->name('banca.import.form');
     Route::post('/import-traspaso-bancas', [ImportExportController::class, 'import'])->name('import.traspaso.bancas');
+    Route::get('/importar', [ImportExportController::class, 'showImportForm'])->name('banca.importar');
+    Route::post('/eliminar-registros-duplicados', [ImportExportController::class, 'eliminarRegistrosDuplicados'])->name('eliminar.registros.duplicados');
 });
+
+// -- define idioma --
+Route::get('/greeting/{locale}', function ($locale) {
+    if (!in_array($locale, ['en', 'es', 'fr'])) {
+        // abort(400);
+        $locale = 'fr';
+    }
+    App::setLocale($locale);
+    session(['locale' => $locale]);
+    return redirect('/');
+});
+// -- fin define idioma --
 
 Route::controller(PrincipalController::class)
     ->prefix('')
