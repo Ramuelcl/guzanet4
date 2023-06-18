@@ -92,13 +92,21 @@
             <div class="text-center md:text-left">
                 <span class="font-bold">Total movimientos:</span> <span class="font-bold">{{ $totalMovimientos }}</span>
             </div>
+            @if (!$totalDuplicados)
+                <form action="{{ route('banca.aMovimientos') }}" method="POST" class="mt-4">
+                    @csrf
+                    <button type="submit"
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">
+                        Pasar registros traspasados a la tabla de movimientos
+                    </button>
+                </form>
+            @endif
         </div>
     </div>
 
     <!-- Aquí muestra la grilla de datos -->
     @if ($data)
         @livewire('tables.live-tabla', ['data' => $data, 'encabezado' => 'Datos Transferidos', 'titulos' => $titulos, 'campos' => $campos])
-        {{-- 'data' => $data, 'titulo' => 'Datos Transferidos', 'encabezado' => $titulos, 'campos' => $campos, 'totalImportados' => $totalImportados, 'totalMovimientos' => $totalMovimientos, 'totalDuplicados' => $totalDuplicados --}}
     @endif
 
     </div>

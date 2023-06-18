@@ -1,27 +1,27 @@
     <x-forms.contenedor01>
-        <!-- encabezados -->
         <x-slot name="encabezado">
-            {{$encabezado}}
+            {{ $encabezado }}
         </x-slot>
         <table>
-            <thead>
-                <x-slot name="titulos">
+            <!-- encabezados -->
+            <x-slot name="titulos">
+                <thead>
                     <tr>
-                        @foreach($titulos as $titulo)
-                        <th colspan="2" class="text-center">{{ $titulo }}</th>
+                        @foreach ($titulos as $titulo)
+                            <th colspan="2" class="text-center">{{ $titulo }}</th>
                         @endforeach
                     </tr>
-                </x-slot>
-            </thead>
+                </thead>
+            </x-slot>
 
             <!-- Contenido principal aquí -->
             <tbody>
                 @foreach ($data as $item)
-                <tr>
-                    @foreach ($campos as $campo)
-                    <td>{{ $item->$campo }}</td>
-                    @endforeach
-                </tr>
+                    <tr>
+                        @foreach ($campos as $campo)
+                            <td>{{ $item->$campo }}</td>
+                        @endforeach
+                    </tr>
                 @endforeach
             </tbody>
         </table>

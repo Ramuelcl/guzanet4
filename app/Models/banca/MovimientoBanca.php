@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class MovimientoBanca extends Model
 {
     use HasFactory, SoftDeletes;
-
+    protected $table = "movimiento_bancas";
     /**
      * Indicates if the model should be timestamped.
      *

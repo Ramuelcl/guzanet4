@@ -23,6 +23,7 @@ Route::group(['prefix' => 'banca'], function () {
     Route::post('/import-traspaso-bancas', [ImportExportController::class, 'import'])->name('import.traspaso.bancas');
     Route::get('/importar', [ImportExportController::class, 'showImportForm'])->name('banca.importar');
     Route::post('/eliminar-registros-duplicados', [ImportExportController::class, 'eliminarRegistrosDuplicados'])->name('eliminar.registros.duplicados');
+    Route::post('/movimientos/pasar', [ImportExportController::class, 'pasar'])->name('banca.aMovimientos');
 });
 
 // -- define idioma --

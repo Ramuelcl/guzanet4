@@ -52,10 +52,18 @@ class TraspasoBancaImport extends clsFileReader
             }
 
             // dd("leyo lineas");
-
             // recupera la linea particionada en un arreglo
             $row = $this->fileReader->parseLine($line, $this->camposArchivo); //para ser asociativos, asigno nombres
-            // dump(["parseado" => $row]);
+
+            if (sizeof($row) < sizeof($this->camposArchivo)) {
+                // debo reconocer cual es el que falta
+                $row['MontantFRANCS'] = 0;
+            }
+
+            // dump($line);
+            // dump(["parseado" => $row, 'entera' => $line]);
+            // sleep(5);
+
 
             // Asociar campos de la tabla con las columnas del archivo
             $rowFormat = [];
@@ -74,7 +82,7 @@ class TraspasoBancaImport extends clsFileReader
                 if (array_key_exists($ind, $row)) {
                     $rowFormat[$ind] = $this->fncTransfiereDato($row[$ind], $tipo);
                 } else {
-                    $rowFormat[$ind] = 0;
+                    // $rowFormat[$ind] = 0;
                     // La columna no existe en el archivo, puedes manejar el caso aquí
                     // por ejemplo, asignar un valor predeterminado o lanzar una excepción
                 }
@@ -82,10 +90,16 @@ class TraspasoBancaImport extends clsFileReader
                 // dd(['indice' => $ind, 'tabla format' => $rowFormat[$ind],  'tipo' => $tipo]);
             }
 
-            // dd(["pasado con valores" => $rowFormat]);
+            // dump(["formateado" => $rowFormat]);
+            // sleep(5);
+
 
             // Crear una nueva instancia del modelo y guardar en la base de datos
-            $modelo = new TraspasoBanca($rowFormat);
+            $modelo = new TraspasoBanca();
+            $modelo->Date = $rowFormat['Date'];
+            $modelo->Libelle = $rowFormat['Libelle'];
+            $modelo->MontantEUROS = $rowFormat['MontantEUROS'];
+            $modelo->MontantFRANCS = $rowFormat['MontantFRANCS'];
             $modelo->NomArchTras = $this->nombreOriginal;
             $modelo->save();
             // dump("crea registro");
@@ -116,49 +130,6 @@ class TraspasoBancaImport extends clsFileReader
             return $value;
         }
     }
-
-    // protected function castearDato($valor, $forzarTipo)
-    // {
-    //     switch ($forzarTipo) {
-    //         case 'alpha':
-    //             return ctype_alpha($valor) ? $valor : null;
-    //         case 'digit':
-    //             return ctype_digit($valor) ? $valor : null;
-    //         case 'float':
-    //             return is_numeric($valor) ? floatval($valor) : null;
-    //         case 'bool':
-    //             return filter_var($valor, FILTER_VALIDATE_BOOLEAN) ? '1' : null;
-    //         case 'date':
-    //             return $this->parsearFecha($valor);
-    //         case 'datetime':
-    //             return $this->parsearFechaHora($valor);
-    //         default:
-    //             return $valor;
-    //     }
-    // }
-
-    private function parsearFecha($valor)
-    {
-        try {
-            $fecha = DateTime::createFromFormat('Y-m-d', $valor);
-            return $fecha->format('Y-m-d');
-        } catch (Exception $e) {
-            // Error al parsear la fecha
-            return null;
-        }
-    }
-
-
-    protected function parsearFechaHora($valor)
-    {
-        try {
-            return new DateTime($valor);
-        } catch (Exception $e) {
-            // Error al parsear la fecha
-            return null;
-        }
-    }
-
 
     public function createTablaTraspasos()
     {

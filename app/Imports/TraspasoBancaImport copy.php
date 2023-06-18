@@ -47,12 +47,6 @@ class TraspasoBancaImport implements ToModel, WithHeadingRow, WithStartRow
 
     public function model(array $row)
     {
-        // $lineaCompleta = implode('', $row); // Unir los campos en una línea completa
-        // // Procesar la línea completa para obtener los campos individuales
-        // $campos = str_getcsv($lineaCompleta, $this->separadorCampos, $this->caracterString, $this->saltosLinea);
-        // dd($lineaCompleta, ' ', $campos);
-
-
         if (self::$fila === 0) {
             $this->createTablaTraspasos();
             $this->headingRow($row);
