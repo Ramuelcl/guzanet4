@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\banca\TraspasoBanca;
+use App\Models\banca\Traspaso;
 use App\Imports\clsFileReader;
 
 use DateTime;
@@ -20,12 +20,12 @@ class TraspasoBancaImport extends clsFileReader
     public $camposArchivo;
     public $cnfTraspaso;
 
-    public function __construct($nombreArchivo, $cnfTraspaso, $camposTabla, $camposArchivo)
+    public function __construct($nombreArchivo, $cnfTraspaso, $camposTabla, $camposArchivo = null)
     {
 
         // Crear una instancia de clsFileReader y configurar opciones personalizadas
         $this->fileReader = new clsFileReader($nombreArchivo);
-
+        // $this->fileReader->determinarOpcionesPorDefecto();
         $this->fileReader->setConfig($cnfTraspaso);
 
         $this->nombreOriginal = $nombreArchivo;
@@ -36,6 +36,7 @@ class TraspasoBancaImport extends clsFileReader
 
     public function import($file)
     {
+        $row = [];
         $this->createTablaTraspasos();
         $asArray = true;
         // Leer el archivo línea por línea
@@ -43,17 +44,29 @@ class TraspasoBancaImport extends clsFileReader
 
         // dd('llegó import');
         $lineas = 0;
-        while (($line = $this->fileReader->readLines($asArray)) !== false) {
+        while (($line = $this->fileReader->readLines()) !== false) {
+            $lineas++;
             // Obtener datos de la línea actual
             // dump([$line, 'lineas' => $lineas, 'encabezado empieza=' => $this->fileReader->letLineaEncabezado()]);
-            $lineas++;
-            if ($lineas <= $this->fileReader->letLineaEncabezado()) {
+            if ($lineas == $this->fileReader->letLineaEncabezado() && $this->camposArchivo === null) {
+                $this->fileReader->determinarOpcionesPorDefecto();
+                $this->camposArchivo = $this->fileReader->parseLine($line);
+                dump(['camposArchivo' => $this->camposArchivo]);
+                continue;
+            }
+            if ($lineas < $this->fileReader->letLineaEncabezado()) {
                 continue;
             }
 
-            // dd("leyo lineas");
+            // dump("leyó linea: " . $line);
             // recupera la linea particionada en un arreglo
-            $row = $this->fileReader->parseLine($line, $this->camposArchivo); //para ser asociativos, asigno nombres
+            try {
+                $row = $this->fileReader->parseLine($line, $this->camposArchivo); //para ser asociativos, asigno nombres
+            } catch (\Throwable $th) {
+                dd("que pasa");
+                throw $th;
+            }
+            // dd(["separó linea: " => $row]);
 
             if (sizeof($row) < sizeof($this->camposArchivo)) {
                 // debo reconocer cual es el que falta
@@ -61,51 +74,62 @@ class TraspasoBancaImport extends clsFileReader
             }
 
             // dump($line);
-            // dump(["parseado" => $row, 'entera' => $line]);
+
             // sleep(5);
-
-
-            // Asociar campos de la tabla con las columnas del archivo
-            $rowFormat = [];
-
-            foreach ($this->camposTabla as $columnaTabla => $campoTabla) {
-                // dump(is_numeric($columnaTabla), $campoTabla);
-
-                if (!is_numeric($columnaTabla)) {
-                    $tipo = $campoTabla;
-                    $ind = $columnaTabla;
-                } else {
-                    $tipo = null;
-                    $ind = $campoTabla;
-                }
-
-                if (array_key_exists($ind, $row)) {
-                    $rowFormat[$ind] = $this->fncTransfiereDato($row[$ind], $tipo);
-                } else {
-                    // $rowFormat[$ind] = 0;
-                    // La columna no existe en el archivo, puedes manejar el caso aquí
-                    // por ejemplo, asignar un valor predeterminado o lanzar una excepción
-                }
-
-                // dd(['indice' => $ind, 'tabla format' => $rowFormat[$ind],  'tipo' => $tipo]);
-            }
-
-            // dump(["formateado" => $rowFormat]);
-            // sleep(5);
-
 
             // Crear una nueva instancia del modelo y guardar en la base de datos
-            $modelo = new TraspasoBanca();
-            $modelo->Date = $rowFormat['Date'];
-            $modelo->Libelle = $rowFormat['Libelle'];
-            $modelo->MontantEUROS = $rowFormat['MontantEUROS'];
-            $modelo->MontantFRANCS = $rowFormat['MontantFRANCS'];
+            dump([0 => $row[$this->camposArchivo[0]], 1 => $row[$this->camposArchivo[1]], 2 => $row[$this->camposArchivo[2]], 3 => $row[$this->camposArchivo[3]],]);
+            $libelle = $this->fncConvertirCadenaBytes($row[$this->camposArchivo[1]]);
+            $modelo = new Traspaso();
+            $modelo->Date = $row[$this->camposArchivo[0]];
+            $modelo->Libelle = $libelle;
+            $modelo->MontantEUROS = $row[$this->camposArchivo[2]];
+            $modelo->MontantFRANCS = $row[$this->camposArchivo[3]];
             $modelo->NomArchTras = $this->nombreOriginal;
+            // $modelo->Date_Libelle_montantEUROS_montantFRANCS =
+            //     $row[$this->camposArchivo[0]]             .
+            //     $libelle .
+            //     $row[$this->camposArchivo[2]] .
+            //     $row[$this->camposArchivo[3]];
             $modelo->save();
             // dump("crea registro");
         }
 
         $this->fileReader->close();
+    }
+
+    //     public function store(Request $request)
+    // {
+    //     // dump($request);
+    //     $request->validate([
+    //         'nombre' => 'required|unique:colors',
+    //         'hexa' => 'required|unique:colors',
+    //     ]);
+    //     $request->merge([
+    //         'slug' => Str::slug($request->nombre),
+    //     ]);
+    //     $color = Color::create($request->all());
+    //     return redirect()
+    //         ->route('backend.colores.edit', $color)
+    //         ->with('info', 'Registro creado');
+    // }
+
+    function fncConvertirCadenaBytes($string, $default = 'UTF-8')
+    {
+        $encodings = array('UTF-8', 'ISO-8859-1', 'Windows-1251');
+        $validEncoding = false;
+        foreach ($encodings as $encoding) {
+            if (mb_check_encoding($string, $encoding)) {
+                $validEncoding = true;
+                echo "La cadena está codificada en $encoding";
+                $string = mb_convert_encoding($string, $default, $encoding);
+                break;
+            }
+        }
+        if (!$validEncoding) {
+            echo "La cadena no está codificada en ninguna de las codificaciones admitidas";
+        }
+        return $string;
     }
 
     private function fncTransfiereDato($valor, $tipoDato = 0)
@@ -154,7 +178,7 @@ class TraspasoBancaImport extends clsFileReader
             $count = DB::table('traspaso_bancas')->count();
             if ($count > 0) {
                 //     DB::table('traspaso_bancas')->truncate();
-                echo "La tabla traspaso_bancas ha sido vaciada.<br>";
+                // echo "La tabla traspaso_bancas ha sido vaciada.<br>";
             }
             //
             if ($count == 0) {

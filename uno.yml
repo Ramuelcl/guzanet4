@@ -1,0 +1,27 @@
+models:
+  banca\Traspaso:
+    date: string:10 nullable default:0
+    libelle: text nullable default:null
+    montantEUROS: string:12 nullable default:0
+    montantFRANCS: string:12 nullable default:0
+    Date_Libelle_montantEUROS_montantFRANCS: text charset:'utf8'
+    NomArchTras: string:100 nullable default:null
+    IdArchMov: string:20 nullable default:null
+    timestamps: true
+
+  banca\Movimiento:
+    cuenta: string:12 nullable default:5578733W020
+    tipo: string:3 nullable default:CCP
+    dateMouvement: date nullable default_format:"Y-m-d"
+    libelle: text
+    montant: decimal:8,2
+    francs: decimal:8,2
+    cliente_id: bigInteger nullable default:null
+    releve: bigInteger nullable default:null
+    dateReleve: date nullable default_format:"Y-m-d"
+    estado: tinyInteger nullable default:0
+    conciliada: tinyInteger nullable default:0
+    indexes:
+      - index: cuenta, dateMouvement
+    softDeletes: true
+    timestamps: true

@@ -25,8 +25,15 @@ class Tabla extends Model
     protected $casts = [
         'tabla' => 'integer',
         'tabla_id' => 'integer',
-        'isActive' => 'boolean',
-        'valor1' => 'decimal:2',
+        'is_active' => 'boolean',
         'valor3' => 'boolean',
     ];
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'Tablas';
+
 }

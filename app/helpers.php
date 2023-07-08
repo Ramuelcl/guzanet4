@@ -372,7 +372,61 @@ if (!function_exists('fncTraduccion')) {
         return $traduccion !== $texto_a_traducir ? $traduccion : $texto_a_traducir;
     }
 }
+if (!function_exists('fncConvertirCadenaBytes')) {
+    function fncConvertirCadenaBytes($string)
+    {
+        // Verificar si la cadena está en formato de cadena de bytes
+        // Verificar si la cadena ya está en UTF-8
+        if (mb_detect_encoding($string, 'UTF-8', true) === 'UTF-8') {
+            return $string; // La cadena ya está en UTF-8, no es necesario convertirla
+        }
 
+        // Opciones de codificaciones a probar
+        $encodings = ['ISO-8859-1', 'Windows-1252', 'UTF-16', 'UTF-8', 'ASCII'];
+
+        // Convertir la cadena a UTF-8 utilizando la primera codificación que funcione
+        foreach ($encodings as $encoding) {
+            $convertedString = @mb_convert_encoding($string, 'UTF-8', $encoding);
+            if ($convertedString !== false) {
+                return $convertedString;
+            }
+        }
+
+        // Si no se pudo convertir, retornar la cadena original
+        return $string;
+    }
+}
+if (!function_exists('fncExplode')) {
+    function fncExplode($line, $separadorCampos = ";", $finLinea = '\r\n')
+    {
+        $fields = [];
+        $field = '';
+        $length = strlen($line);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $line[$i];
+            $charCode = ord($char);
+            $convertedChar = chr($charCode);
+            // dump(['char' => $char, 'charCode' => $charCode, 'convertedChar' => $convertedChar, 'separadorCampos' => $this->separadorCampos]);
+            if ($charCode === 9 && $separadorCampos === '\t') {
+                // dd("entró en tabulador 9");
+                $fields[] = $field;
+                $field = '';
+            } elseif ($char === $separadorCampos) {
+                $fields[] = $field;
+                $field = '';
+            } elseif ($charCode === 10 or $charCode === 13 or $char === $finLinea) {
+                // quita el caracter de fin de linea
+            } else {
+                $field .= $char;
+            }
+        }
+
+        $fields[] = $field;
+
+        return $fields;
+    }
+}
 /**
  * Funcion para buscar archivo(s) en un directorio o subdirectorios
  *

@@ -27,10 +27,9 @@ class Perfil extends Model
     protected $casts = [
         'user_id' => 'integer',
         'edad' => 'integer',
-        'id_profesion' => 'integer',
     ];
 
-    public function user1(): HasOne
+    public function user(): HasOne
     {
         return $this->hasOne(\App\Models\User::class);
     }
@@ -39,4 +38,12 @@ class Perfil extends Model
     {
         return $this->belongsTo(\App\Models\User::class);
     }
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'Perfils';
+
 }

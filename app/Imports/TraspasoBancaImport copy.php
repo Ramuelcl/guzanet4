@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\banca\TraspasoBanca;
+use App\Models\banca\Traspaso;
 //
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -13,10 +13,10 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
+// use Maatwebsite\Excel\Concerns\WithMapping;
+// use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 
-use Maatwebsite\Excel\Concerns\FromCollection;
+// use Maatwebsite\Excel\Concerns\FromCollection;
 
 
 class TraspasoBancaImport implements ToModel, WithHeadingRow, WithStartRow
@@ -81,12 +81,13 @@ class TraspasoBancaImport implements ToModel, WithHeadingRow, WithStartRow
         dump(['row' => $row, 'date' => $date, 'Libelle' => $libelle, 'MontantEUROS' => $montantEUROS, 'MontantFRANCS' => $montantFRANCS, 'NomArchTras' => $this->nombreOriginal, 'fila' => self::$fila]);
         // Crear el modelo TraspasoBanca con los valores obtenidos
         self::$fila++;
-        $Traspaso = new TraspasoBanca([
+        $Traspaso = new Traspaso([
             'Date' => $date,
             'Libelle' => $libelle,
             'MontantEUROS' => $montantEUROS,
             'MontantFRANCS' => $montantFRANCS,
-            'NomArchTras' => $this->nombreOriginal
+            'NomArchTras' => $this->nombreOriginal,
+            'Date_Libelle_montantEUROS_montantFRANCS' => $date . $libelle . $montantEUROS . $montantFRANCS
         ]);
         $Traspaso->save();
         // dd($Traspaso);

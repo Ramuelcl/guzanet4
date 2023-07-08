@@ -26,26 +26,39 @@ class Marcador extends Model
     protected $casts = [
         'id' => 'integer',
         'metadata' => 'array',
-        'isActive' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
-    public function xPosts(): MorphToMany
+    public function mmPosts(): MorphToMany
     {
-        return $this->morphedByMany(Post::class, 'marcadorable');
+        return $this->morphedByMany(\App\Models\posts\Post::class, 'marcadorable');
     }
 
-    public function xVideos(): MorphToMany
+    public function mmVideos(): MorphToMany
     {
-        return $this->morphedByMany(Video::class, 'marcadorable');
+        return $this->morphedByMany(\App\Models\posts\Video::class, 'marcadorable');
     }
 
-    public function xImagens(): MorphToMany
+    public function mmImagens(): MorphToMany
     {
-        return $this->morphedByMany(Imagen::class, 'marcadorable');
+        return $this->morphedByMany(\App\Models\posts\Imagen::class, 'marcadorable');
     }
 
-    public function xMovimientos(): MorphToMany
+    public function mmMovimientos(): MorphToMany
     {
-        return $this->morphedByMany(Movimiento::class, 'marcadorable');
+        return $this->morphedByMany(\App\Models\banca\Movimiento::class, 'marcadorable');
     }
+
+    public function mmCategorias(): MorphToMany
+    {
+        return $this->morphedByMany(Categoria::class, 'marcadorable');
+    }
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'Marcadors';
+
 }

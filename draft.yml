@@ -1,18 +1,17 @@
 models:
-
   backend\Tabla:
     id: false
     tabla: bigInteger
     tabla_id: bigInteger
-    nombre: string:45 charset:'utf8'
-    descripcion: string:128 nullable default:null charset:'utf8'
-    activo: boolean nullable default:true
-    valor1: decimal:8,2 nullable default:null
-    valor2: string:128 nullable default:null
+    nombre: string:45 charset:'utf8mb4'
+    descripcion: string:128 nullable default:null charset:'utf8mb4'
+    is_active: boolean nullable default:true
+    valor1: string:128 nullable default:null charset:'utf8mb4'
+    valor2: string:128 nullable default:null charset:'utf8mb4'
     valor3: boolean nullable default:false
     indexes:
       - primary: tabla, tabla_id
-      - index: tabla, nombre
+      - index: nombre
     softDeletes: true
 
   backend\Categoria:
@@ -20,7 +19,18 @@ models:
     babosa: string:45 nullable default:null charset:'utf8'
     softDeletes: true
     relationships:
-      morphedByMany: Post, Video, Imagen
+      morphedByMany: Post:mmPost, Video:mmVideo, Imagen:mmImagen, Movimiento:mmMovimiento
+
+  backend\Marcador:
+    nombre: string:32 charset:'utf8'
+    babosa: string:45 nullable default:null charset:'utf8'
+    hexa: string:7 unique default:'#' charset:'utf8'
+    rgb: string:20 nullable default:null charset:'utf8'
+    metadata: json nullable
+    is_active: boolean nullable default:true
+    softDeletes: true
+    relationships:
+      morphedByMany: Post:mmPost, Video:mmVideo, Imagen:mmImagen, Movimiento:mmMovimiento, Categoria:mmCategoria
 
   backend\Perfil:
     id: false
@@ -44,40 +54,108 @@ models:
     device: string:17 nullable default:null charset:'utf8'
     softDeletes: true
     relationships:
-      hasOne: User
+      belongsTo: User
 
-  backend\Marcador:
-    nombre: string:45 nullable default:null unique charset:'utf8'
-    babosa: string:45 nullable default:null charset:'utf8'
-    hexa: string:7 unique default:'#' charset:'utf8'
-    rgb: string:20 nullable default:null charset:'utf8'
-    metadata: json nullable
+  # posts\Post:
+  #   user_id: id foreign:users.id
+  #   name: string:32 charset:'utf8'
+  #   contenido: longtext nullable charset:'utf8'
+  #   publicado: timestamp nullable useCurrent
+  #   actualizado: timestamp nullable useCurrent useCurrentOnUpdate
+  #   softDeletes: true
+  #   relationships:
+  #     morphedByMany: Marcador:mmMarcador, Categoria:mmCategoria,
+
+  # posts\Video:
+  #   name: string:32 charset:'utf8'
+  #   user_id: id foreign:users.id
+  #   url: string:128 charset:'utf8'
+  #   softDeletes: true
+  #   relationships:
+  #     morphedByMany: Marcador:mmMarcador, Categoria:mmCategoria,
+
+  # posts\Imagen:
+  #   name: string:32 charset:'utf8'
+  #   user_id: id foreign:users.id
+  #   url: string:128 charset:'utf8'
+  #   softDeletes: true
+  #   relationships:
+  #     morphedByMany: Marcador:mmMarcador, Categoria:mmCategoria,
+
+  backend\Telefono:
+    tipo: string:2
+    numero: string:13
+    relationships:
+      morphedByMany: Entidad:mmEntidad
+
+  backend\Pais:
+    id: bigIncrements
+    nombre: string:64 nullable default:null charset:'utf8mb4'
+    bandera: string:128 nullable default:null charset:'utf8mb4'
+    idioma: string:64 nullable default:null charset:'utf8mb4'
+    idioma_web: string:5 nullable default:null charset:'utf8mb4'
+    timestamps: false
     softDeletes: true
     relationships:
-      morphedByMany: Post:postIndex, Video:videoIndex, Imagen:imagenIndex
+      BelongsTo: Ciudad:pais_ciudades
 
-  posts\Post:
-    user_id: id foreign:users.id
-    name: string:32 charset:'utf8'
-    contenido: longtext nullable charset:'utf8'
-    publicado: timestamp nullable useCurrent
-    actualizado: timestamp nullable useCurrent useCurrentOnUpdate
+  backend\Ciudad:
+    id: bigIncrements
+    nombre: string:64 nullable default:null charset:'utf8mb4'
+    pais_id: foreignId:backend_pais.id
+    timestamps: false
     softDeletes: true
     relationships:
-      morphToMany: Marcador, Categoria
+      belongsTo: Direccion:ciudad_direcciones
 
-  posts\Video:
-    name: string:32 charset:'utf8'
-    user_id: id foreign:users.id
-    url: string:128 charset:'utf8'
+  backend\Direccion:
+    id: bigIncrements
+    entidad_id: foreignId:backend_entidad.id
+    direccion: string:128 charset:'utf8mb4'
+    ciudad_id: foreignId:backend_ciudad.id
+    codigo_postal: string:6 nullable default:0 charset:'utf8mb4'
+    region: string:64 nullable default:null charset:'utf8mb4'
+    relationships:
+      belongsTo: Entidad:direccion_entidad_id_foreign, Ciudad:direccion_ciudad_id_foreign
+    softDeletes: true
+    timestamps: true
+
+  backend\Entidad:
+    id: bigIncrements
+    razonSocial: string:128 nullable default:null charset:'utf8mb4'
+    nombres: string:80 charset:'utf8mb4'
+    apellidos: string:80 charset:'utf8mb4'
+    is_active: boolean nullable default:true
+    eMail: string:255 nullable default:null unique charset:'utf8mb4'
+    tipo: foreignId:backend_tablas.tabla nullable default:null
+    timestamps: true
     softDeletes: true
     relationships:
-      morphToMany: Marcador, Categoria
+      belongsTo: Tabla
 
-  posts\Imagen:
-    name: string:32 charset:'utf8'
-    user_id: id foreign:users.id
-    url: string:128 charset:'utf8'
+  banca\Traspaso:
+    date: string:10 nullable default:0
+    libelle: text
+    montantEUROS: string:12 nullable default:0
+    montantFRANCS: string:12 nullable default:0
+    Date_Libelle_montantEUROS_montantFRANCS: text charset:'utf8'
+    NomArchTras: string:100 nullable default:null
+    IdArchMov: string:20 nullable default:null
+    timestamps: true
+
+  banca\Movimiento:
+    cuenta: string:12 nullable default:5578733W020
+    tipo: string:3 nullable default:CCP
+    dateMouvement: date nullable default_format:"Y-m-d"
+    libelle: text
+    montant: decimal:8,2
+    francs: decimal:8,2
+    cliente_id: bigInteger nullable default:null
+    releve: bigInteger nullable default:null
+    dateReleve: date nullable default_format:"Y-m-d"
+    estado: tinyInteger nullable default:0
+    conciliada: tinyInteger nullable default:0
+    indexes:
+      - index: cuenta, dateMouvement
     softDeletes: true
-    relationships:
-      morphToMany: Marcador, Categoria
+    timestamps: true

@@ -3,7 +3,8 @@
 
 namespace App\Http\Livewire\Forms;
 
-use App\Models\backend\Menu;
+use App\Models\backend\Tabla;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Livewire\Component;
 
@@ -16,10 +17,29 @@ class MenuComponent extends Component
 
     public function mount($orientation = false)
     {
-        $this->menus = Menu::whereNull('parent_id')
-            ->where('isActive', true)
-            ->with('children')
-            ->get();
+        $menus = Tabla::where('tabla', 1000)
+            ->whereNull('valor1') // parent_id
+            ->where('is_active', true)
+            ->get(['tabla_id as id', 'nombre', 'descripcion as url', DB::raw('CAST(valor1 AS UNSIGNED) as parent_id'), 'valor2 as icono'])
+            ->toArray();
+
+        $this->menus = array_map(function ($menu) {
+            $submenu = Tabla::where('tabla', 1000)
+                ->where('valor1', $menu['id'])
+                ->get(['tabla_id as id', 'nombre', 'descripcion as url', DB::raw('CAST(valor1 AS UNSIGNED) as parent_id'), 'valor2 as icono'])
+                ->toArray();
+
+            $menu['submenu'] = $submenu ?: false;
+
+            unset($menu['valor3']);
+            unset($menu['created_at']);
+            unset($menu['updated_at']);
+            unset($menu['deleted_at']);
+
+            return $menu;
+        }, $menus);
+
+        // dd($this->menus);
         $this->toggleOrientation($orientation);
     }
 
@@ -33,7 +53,7 @@ class MenuComponent extends Component
         $this->orientation = $orientation;
     }
 
-    public function isActiveMenu($url)
+    public function is_activeMenu($url)
     {
         return request()->url() === url($url);
     }

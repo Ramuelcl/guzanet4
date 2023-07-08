@@ -1,0 +1,17 @@
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 1, 'Inicio', '/', 1, NULL, 'home');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 2, 'Tablas', NULL, 1, NULL, 'table-cells');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 3, 'Categorias', '/categorias', 1, 2, 'rectangle-stack');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 4, 'Marcadores', '/marcadores', 1, 2, 'tag');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 5, 'Usuario', NULL, 1, NULL, 'user');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 6, 'Usuarios', '/admin/usuarios', 1, 5, 'users');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 7, 'Roles', '/admin/roles', 0, 5, 'user-circle');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 8, 'Permisos', '/admin/permisos', 1, 5, 'academic-cap');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 9, 'Acerca de', '/acercade', 1, NULL, 'bookmark-square');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 10, 'Contacto', '/contacto', 1, NULL, 'book-open');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 11, 'Banca', NULL, 1, NULL, 'arrow-trending-up');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 12, 'Importar csv', '/banca/import', 1, 11, 'arrow-down-tray');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 13, 'Exportar movimientos a Excel', '/exportar', 1, 11, 'arrow-up-tray');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 14, 'Langes', NULL, 1, NULL, 'flags');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 15, 'English', '/greeting/en', 1, 14, '/flags/england');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 16, 'Françes', '/greeting/fr', 1, 14, '/flags/france');
+INSERT INTO `tablas` (`tabla`, `tabla_id`, `nombre`, `descripcion`, `is_active`, `valor1`, `valor2`) VALUES (1000, 17, 'Español', '/greeting/es', 1, 14, '/flags/espana');

@@ -5,7 +5,6 @@ namespace App\Models\backend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserSetting extends Model
@@ -27,15 +26,18 @@ class UserSetting extends Model
     protected $casts = [
         'user_id' => 'integer',
         'autologin' => 'boolean',
+        'options' => 'array',
     ];
-
-    public function user1(): HasOne
-    {
-        return $this->hasOne(\App\Models\User::class);
-    }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class);
     }
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'user_settings';
 }

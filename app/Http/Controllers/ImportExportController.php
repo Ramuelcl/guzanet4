@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Imports\TraspasoBancaImport;
-use App\Models\banca\TraspasoBanca;
-use App\Models\banca\MovimientoBanca;
+use App\Models\banca\Traspaso;
+use App\Models\banca\Movimiento;
 use Carbon\Carbon;
-use DateTime;
-use Exception;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Session;
+use DateTime, Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -32,17 +29,17 @@ class ImportExportController extends Controller
 
         $campos = [
             'id',
-            'Date',
-            'Libelle',
-            'MontantEUROS',
-            'MontantFRANCS',
+            'date',
+            'libelle',
+            'montantEUROS',
+            'montantFRANCS',
             'NomArchTras',
             'IdArchMov'
         ];
-        $totalImportados = TraspasoBanca::count();
-        $totalMovimientos = TraspasoBanca::whereNotNull('IdArchMov')->count();
+        $totalImportados = Traspaso::count();
+        $totalMovimientos = Traspaso::whereNotNull('IdArchMov')->count();
 
-        $registrosDuplicados = DB::table('traspaso_bancas')
+        $registrosDuplicados = DB::table('traspasos')
             ->select(DB::raw("GROUP_CONCAT(CONCAT(Date, Libelle, MontantEUROS) SEPARATOR ', ') AS concat"))
             ->groupBy('Date', 'Libelle', 'MontantEUROS')
             ->havingRaw('COUNT(*) > 1')
@@ -50,7 +47,8 @@ class ImportExportController extends Controller
 
         $totalDuplicados = $registrosDuplicados->count();
 
-        $data = TraspasoBanca::all();
+        $data = Traspaso::all();
+        // dd($data);
 
         return view('banca.import', ['data' => $data,  'titulos' => $titulos, 'campos' => $campos, 'totalImportados' => $totalImportados, 'totalMovimientos' => $totalMovimientos, 'totalDuplicados' => $totalDuplicados]);
     }
@@ -62,8 +60,15 @@ class ImportExportController extends Controller
         // Validar el archivo enviado por el formulario
         $request->validate([
             'archivo' => 'required|array',
-            'archivo.*' => 'mimes:csv,txt,tsv|max:2048',
+            'archivo.*' => 'file|mimes:csv,txt,tsv|max:2048',
+        ], [
+            'archivo.required' => 'El campo archivo es requerido.',
+            'archivo.array' => 'El campo archivo debe ser un arreglo.',
+            'archivo.*.file' => 'El archivo seleccionado no es válido.',
+            'archivo.*.mimes' => 'El archivo debe tener una de las siguientes extensiones: csv, txt, tsv.',
+            'archivo.*.max' => 'El tamaño máximo permitido para el archivo es de 2048 KB.',
         ]);
+
 
         $cnfTraspaso = [
             'separadorCampos' => $request->input('separador_campos'),
@@ -77,7 +82,7 @@ class ImportExportController extends Controller
 
             // Obtener el nombre original del archivo
             $nombreOriginal = $archivo->getClientOriginalName();
-            $extension = $archivo->getClientOriginalExtension();
+            // $extension = $archivo->getClientOriginalExtension();
 
             // dd($archivo, $nombreOriginal, $extension);
 
@@ -88,55 +93,175 @@ class ImportExportController extends Controller
                 session()->put('error', $mensajes);
             } else {
                 // Procede con la importación del archivo
-                try {
-                    // Determinar los campos y columnas correspondientes según la extensión del archivo
-                    $camposTabla = [
-                        'Date',
-                        'Libelle',
-                        'MontantEUROS',
-                        'MontantFRANCS',
-                        'NomArchTras'
-                        // 'Date' => 'date',
-                        // 'Libelle' => 'text',
-                        // 'MontantEUROS' => 'decimal,2',
-                        // 'MontantFRANCS' => 'decimal,2',
-                        // 'NomArchTras'
-                    ];
+                // try {
+                // Determinar los campos y columnas correspondientes según la extensión del archivo
+                $camposTabla = [
+                    'Date',
+                    'Libelle',
+                    'MontantEUROS',
+                    'MontantFRANCS',
+                    'NomArchTras'
+                    // 'Date' => 'date',
+                    // 'Libelle' => 'text',
+                    // 'MontantEUROS' => 'decimal,2',
+                    // 'MontantFRANCS' => 'decimal,2',
+                    // 'NomArchTras'
+                ];
 
-                    // Columnas del archivo
-                    $camposArchivo = [
-                        'Date',
-                        'Libelle',
-                        'MontantEUROS',
-                        'MontantFRANCS',
-                    ];
-                    // dd(['camposTabla' => $camposTabla, 'camposArchivo' => $camposArchivo]);
+                // Columnas del archivo
+                $camposArchivo = [
+                    'Date',
+                    'Libelle',
+                    'MontantEUROS',
+                    'MontantFRANCS',
+                ];
+                // dd(['camposTabla' => $camposTabla, 'camposArchivo' => $camposArchivo]);
 
-                    // Crear una instancia de TraspasoBancaImport con los parámetros necesarios
-                    $importador = new TraspasoBancaImport($nombreOriginal, $cnfTraspaso, $camposTabla, $camposArchivo);
-                    // Importar los datos del archivo
-                    // dd(['archivo' => $archivo]);
-                    $importador->import($archivo);
-                    // dd(['importador' => $importador]);
+                // Crear una instancia de TraspasoBancaImport con los parámetros necesarios
+                $importador = new TraspasoBancaImport($nombreOriginal, $cnfTraspaso, $camposTabla); //, $camposArchivo
+                // Importar los datos del archivo
+                // dd(['archivo' => $archivo]);
+                $importador->import($archivo);
+                // dd(['importador' => $importador]);
 
-                    // Redireccionar o mostrar un mensaje de éxito
-                    $mensajes['success'] = "El archivo ($nombreOriginal) se ha importado.";
-                    session()->put('success', $mensajes);
-                } catch (\Exception $e) {
-                    // dd($archivo, $e->getMessage());
-                    $mensajes['error'] = 'Ha ocurrido un error al importar el archivo: ' . $e->getMessage();
-                    session()->put('error', $mensajes);
-                }
+                // Redireccionar o mostrar un mensaje de éxito
+                $mensajes['success'] = "El archivo ($nombreOriginal) se ha importado.";
+                session()->put('success', $mensajes);
+                // } catch (\Exception $e) {
+                //     // dd($archivo, $e->getMessage());
+                //     $mensajes['error'] = 'Ha ocurrido un error al importar el archivo: ' . $e->getMessage();
+                //     session()->put('error', $mensajes);
+                // }
             }
         }
         // Session::flash('session', $mensajes);
+        // dd("PARAR");
         return redirect()->back();
     }
+
+    // public function import2(Request $request)
+    // {
+    //     // dd($request);
+
+    //     // Validar el archivo enviado por el formulario
+    //     $request->validate([
+    //         'archivo' => 'required|array',
+    //         'archivo.*' => 'file|mimes:csv,txt,tsv|max:2048',
+    //     ], [
+    //         'archivo.required' => 'El campo archivo es requerido.',
+    //         'archivo.array' => 'El campo archivo debe ser un arreglo.',
+    //         'archivo.*.file' => 'El archivo seleccionado no es válido.',
+    //         'archivo.*.mimes' => 'El archivo debe tener una de las siguientes extensiones: csv, txt, tsv.',
+    //         'archivo.*.max' => 'El tamaño máximo permitido para el archivo es de 2048 KB.',
+    //     ]);
+    //     $archivos = $request->file('archivo');
+    //     foreach ($archivos as $archivo) {
+
+    //         // Obtener el nombre original del archivo
+    //         $nombreOriginal = $archivo->getClientOriginalName();
+    //         // $extension = $archivo->getClientOriginalExtension();
+
+    //         // dd($archivo, $nombreOriginal, $extension);
+
+    //         // Verificar si el archivo ya ha sido importado
+    //         if ($this->checkFileImported($nombreOriginal)) {
+    //             // dump(['Archivo ya traspasado: ' => $archivo]);
+    //             $mensajes['error'] = "Archivo ya traspasado: $nombreOriginal";
+    //             session()->put('error', $mensajes);
+    //         } else {
+    //             //
+    //         }
+    //     }
+
+    //     // $archivo = '/ruta/al/archivo'; // Ruta completa al archivo
+    //     $rutaArchivo = $archivo->getRealPath();        // Obtener la extensión del archivo
+    //     $extension = $archivo->getClientOriginalExtension(); // pathinfo($archivo, PATHINFO_EXTENSION);
+
+    //     switch ($extension) {
+    //         case 'tsv':
+    //             $fieldsTerminatedBy = '\t'; // Separador de campos para archivos TSV
+    //             break;
+    //         case 'csv':
+    //             $fieldsTerminatedBy = ';'; // Separador de campos para archivos CSV
+    //             break;
+    //         case 'txt':
+    //             $fieldsTerminatedBy = ','; // Separador de campos para archivos TXT
+    //             break;
+    //         default:
+    //             // Extensión de archivo no soportada
+    //             die('Extensión de archivo no soportada');
+    //     }
+
+    //     $linesTerminatedBy = '\r\n'; // Separador de líneas por defecto
+
+    //     // Leer el archivo y buscar la línea de subtítulos
+    //     $handle = fopen($archivo, 'r');
+    //     $ignoreLines = 0; // Contador de líneas a ignorar antes de la línea de subtítulos
+    //     $subtitlesLine = '';
+    //     while (($line = fgets($handle)) !== false) {
+    //         if (strpos($line, "Date\tLibell") === 0 || strpos($line, "Date;Libell") === 0) {
+    //             $subtitlesLine = $line;
+    //             break;
+    //         }
+    //         $ignoreLines++;
+    //     }
+    //     fclose($handle);
+
+    //     // Verificar si se encontró la línea de subtítulos
+    //     if (empty($subtitlesLine)) {
+    //         die('No se encontró la línea de subtítulos en el archivo');
+    //     } else {
+    //         $subtitlesLine = str_replace(['(', ')'], '', $subtitlesLine);
+    //         $subtitlesLine = fncConvertirCadenaBytes($subtitlesLine);
+    //         // dump($subtitlesLine);
+    //         $subtitlesLine = fncCambiaCaracteresEspeciales($subtitlesLine);
+    //         // dump($subtitlesLine);
+    //         $fieldNames = fncExplode($subtitlesLine, $fieldsTerminatedBy, $linesTerminatedBy);
+    //         // dd($fieldNames);
+    //     }
+
+    //     // dump($fieldNames, $fieldsTerminatedBy, $linesTerminatedBy);
+
+    //     // Escapar los caracteres extraños en los nombres de campo
+    //     // $escapedFieldNames = array_map(function ($fieldName) {
+    //     //     // $fieldName = mb_convert_encoding($fieldName, 'HTML-ENTITIES', 'UTF-8');
+    //     //     // $fieldName = htmlentities($fieldName, ENT_QUOTES, 'UTF-8');
+    //     //     $fieldName = fncCambiaCaracteresEspeciales($fieldName);
+    //     //     return '`' . str_replace('`', '``', $fieldName) . '`';
+    //     // }, $fieldNames);
+
+    //     // Construir la parte SET de la instrucción SQL
+    //     $setClause = '';
+    //     foreach ($fieldNames as $index => $fieldName) {
+    //         $setClause .= "`$fieldName`" . " = @" . $fieldName;
+    //         if ($index < count($fieldNames) - 1) {
+    //             $setClause .= ", ";
+    //         }
+    //     }
+    //     // dd($setClause);
+
+    //     // Construir la instrucción SQL completa con el número de líneas a ignorar
+    //     dump($rutaArchivo, 'C:/Users/ramue/OneDrive/Dokument/banca/5578733W0201312047368499.tsv');
+    //     $sql = "LOAD DATA INFILE 'C:/Users/ramue/OneDrive/Dokument/banca/5578733W0201312047368499.tsv'
+    //     INTO TABLE traspasos
+    //     FIELDS TERMINATED BY '$fieldsTerminatedBy'
+    //     LINES TERMINATED BY '$linesTerminatedBy'
+    //     IGNORE $ignoreLines LINES
+    //     SET
+    //         Date = @Date,
+    //         Libelle = @Libelle,
+    //         MontantEUROS = @MontantEUROS,
+    //         MontantFRANCS = @MontantFRANCS,
+    //         NomArchTras = '$nombreOriginal'";
+
+    //     // Ejecutar la instrucción SQL en la base de datos
+    //     DB::connection()->getpdo()->exec($sql);
+    // }
 
     public function checkFileImported($nombreArchivo)
     {
         try {
-            $count = TraspasoBanca::where('NomArchTras', $nombreArchivo)->count();
+            $count = Traspaso::where('NomArchTras', $nombreArchivo)->count();
         } catch (\Throwable $th) {
             $count = 0;
         }
@@ -146,13 +271,14 @@ class ImportExportController extends Controller
 
     public function eliminarRegistrosDuplicados()
     {
-        $registrosDuplicados = TraspasoBanca::selectRaw('MIN(id) as min_id, CONCAT(Date, Libelle, MontantEUROS, MontantFRANCS) as concatFields')
+        // dd('eliminarRegistrosDuplicados');
+        $registrosDuplicados = Traspaso::selectRaw('MIN(id) as min_id, CONCAT(Date, Libelle, MontantEUROS, MontantFRANCS) as concatFields')
             ->groupBy('Date', 'Libelle', 'MontantEUROS', 'MontantFRANCS')
             ->havingRaw('COUNT(*) > 1')
             ->get();
 
         foreach ($registrosDuplicados as $registro) {
-            TraspasoBanca::where('id', '<>', $registro->min_id)
+            Traspaso::where('id', '<>', $registro->min_id)
                 ->whereRaw('CONCAT(Date, Libelle, MontantEUROS, MontantFRANCS) = ?', [$registro->concatFields])
                 ->delete();
         }
@@ -162,37 +288,40 @@ class ImportExportController extends Controller
 
     public function pasar()
     {
-        // Obtener los registros sin idArchMov de la tabla traspaso_bancas
+        // Obtener los registros sin idArchMov de la tabla traspasos
         try {
-            $registros = TraspasoBanca::whereNull('idArchMov')->get();
+            $registros = Traspaso::whereNull('idArchMov')->get();
+            if ($registros) {
+                foreach ($registros as $registro) {
+                    // Crear un nuevo registro en la tabla movimiento_bancas
+                    $movimiento = new Movimiento();
 
-            foreach ($registros as $registro) {
-                // Crear un nuevo registro en la tabla movimiento_bancas
-                $movimiento = new MovimientoBanca();
+                    try {
+                        $fechaFormateada = $this->castearDato($registro->Date, 'date1');
+                        $montoFormateado = $this->castearDato($registro->MontantEUROS, 'float');
+                        // dd(['fecha' => $fechaFormateada, 'monto' => $montoFormateado]);
+                        $movimiento->dateMouvement = $fechaFormateada;
+                        $movimiento->libelle = $registro->Libelle;
+                        $movimiento->montant = $montoFormateado;
+                        $movimiento->estado = 1; // Traspasada
+                        //
+                        $movimiento->save();
 
-                try {
-                    $fechaFormateada = $this->castearDato($registro->Date, 'date2');
-                    $montoFormateado = $this->castearDato($registro->MontantEUROS, 'float');
-                    dd(['fecha' => $fechaFormateada, 'fecha' => $montoFormateado]);
-                    $movimiento->dateMouvement = $fechaFormateada;
-                    $movimiento->libelle = $registro->Libelle;
-                    $movimiento->montant = $montoFormateado;
-                    $movimiento->estado = 1; // Traspasada
-                    //
-                    $movimiento->save();
-
-                    // Obtener el id del movimiento guardado
-                    $idMovimiento = $movimiento->id;
-                    dd($idMovimiento);
-                    // Actualizar el campo idArchMov en la tabla traspaso_bancas
-                    $registro->idArchMov = $idMovimiento;
-                    $registro->save();
-                } catch (\Throwable $e) {
-                    // Manejar el error
-                    // Puedes registrar el error, mostrar un mensaje o realizar alguna otra acción según tus necesidades
-                    // Por ejemplo, puedes usar Log::error($e->getMessage()) para registrar el error en los logs
-                    Log::error($e->getMessage());
+                        // Obtener el id del movimiento guardado
+                        $idMovimiento = $movimiento->id;
+                        // dd($idMovimiento);
+                        // Actualizar el campo idArchMov en la tabla traspasos
+                        $registro->idArchMov = $idMovimiento;
+                        $registro->save();
+                    } catch (\Throwable $e) {
+                        // Manejar el error
+                        // Puedes registrar el error, mostrar un mensaje o realizar alguna otra acción según tus necesidades
+                        // Por ejemplo, puedes usar Log::error($e->getMessage()) para registrar el error en los logs
+                        Log::error($e->getMessage());
+                    }
                 }
+            } else {
+                return redirect()->back()->with('success', 'No hay registros a mover');
             }
         } catch (\Throwable $e) {
             // Manejar el error
@@ -200,6 +329,7 @@ class ImportExportController extends Controller
             // Por ejemplo, puedes usar Log::error($e->getMessage()) para registrar el error en los logs
             Log::error($e->getMessage());
         }
+        return redirect()->back()->with('success', 'Registros movidos correctamente');
     }
 
     protected function castearDato($valor, $forzarTipo)
@@ -207,29 +337,71 @@ class ImportExportController extends Controller
         $valor2 = null;
         switch ($forzarTipo) {
             case 'alpha':
-                $valor2 = ctype_alpha($valor) ? $valor : null;
+                try {
+                    $valor2 = ctype_alpha($valor) ? $valor : null;
+                } catch (\Throwable $e) {
+                    $valor2 = null;
+                    error_log("Error en castearDato: " . $e->getMessage());
+                }
+                break;
             case 'digit':
-                $valor2 = ctype_digit($valor) ? $valor : null;
+                try {
+                    $valor2 = ctype_digit($valor) ? $valor : null;
+                } catch (\Throwable $e) {
+                    $valor2 = null;
+                    error_log("Error en castearDato: " . $e->getMessage());
+                }
+                break;
             case 'float':
-                $valor2 = $this->convertirStringANumerico($valor);
-                // dd($valor2);
-                $valor2 = is_numeric($valor2) ? floatval($valor2) : null;
+                try {
+                    $valor2 = $this->convertirStringANumerico($valor);
+                    $valor2 = is_numeric($valor2) ? floatval($valor2) : null;
+                } catch (\Throwable $e) {
+                    $valor2 = null;
+                    error_log("Error en castearDato: " . $e->getMessage());
+                }
+                break;
             case 'bool':
-                $valor2 = filter_var($valor, FILTER_VALIDATE_BOOLEAN) ? '1' : null;
+                try {
+                    $valor2 = filter_var($valor, FILTER_VALIDATE_BOOLEAN);
+                } catch (\Throwable $e) {
+                    $valor2 = null;
+                    error_log("Error en castearDato: " . $e->getMessage());
+                }
+                break;
             case 'date1':
-                $valor2 = $this->parsearFecha($valor);
+                try {
+                    $valor2 = $this->parsearFecha($valor);
+                } catch (\Throwable $e) {
+                    $valor2 = null;
+                    error_log("Error en castearDato: " . $e->getMessage());
+                }
+                break;
             case 'date2':
-                $valor2 = $this->parsearFecha2($valor);
+                try {
+                    $valor2 = $this->parsearFecha2($valor);
+                } catch (\Throwable $e) {
+                    $valor2 = null;
+                }
+                break;
             case 'date3':
-                $valor2 = $this->parsearFecha2($valor);
+                try {
+                    $valor2 = $this->parsearFecha2($valor);
+                } catch (\Throwable $e) {
+                    $valor2 = null;
+                }
+                break;
             case 'datetime':
-                $valor2 = $this->parsearFechaHora($valor);
-                // default:
-                //     return $valor;
+                try {
+                    $valor2 = $this->parsearFechaHora($valor);
+                } catch (\Throwable $e) {
+                    $valor2 = null;
+                }
+                break;
         }
-        // dump(['valor' => $valor, 'tipo' => $forzarTipo, 'resultado' => $valor2]);
         return $valor2;
     }
+
     function convertirStringANumerico($valor)
     {
         // Obtener el separador decimal actual

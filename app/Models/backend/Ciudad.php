@@ -5,10 +5,11 @@ namespace App\Models\backend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ciudad extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * Indicates if the model should be timestamped.
@@ -24,23 +25,16 @@ class Ciudad extends Model
      */
     protected $guarded = [];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'id' => 'integer',
-        'pais_id' => 'integer',
-    ];
-
-    public function direcciones(): BelongsTo
+    public function ciudadDirecciones(): BelongsTo
     {
         return $this->belongsTo(Direccion::class);
     }
 
-    public function pais(): BelongsTo
-    {
-        return $this->belongsTo(Pais::class);
-    }
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'Ciudads';
+
 }

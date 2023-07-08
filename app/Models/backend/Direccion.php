@@ -5,11 +5,11 @@ namespace App\Models\backend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Direccion extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that aren't mass assignable.
@@ -18,28 +18,21 @@ class Direccion extends Model
      */
     protected $guarded = [];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'id' => 'integer',
-        'ciudad_id' => 'integer',
-    ];
-
-    public function xClientes(): MorphToMany
+    public function direccionEntidad(): BelongsTo
     {
-        return $this->morphedByMany(Cliente::class, 'direccionable');
+        return $this->belongsTo(Entidad::class);
     }
 
-    public function xVendedors(): MorphToMany
-    {
-        return $this->morphedByMany(\App\Models\compras\Vendedor::class, 'direccionable');
-    }
-
-    public function ciudad(): BelongsTo
+    public function direccionCiudad(): BelongsTo
     {
         return $this->belongsTo(Ciudad::class);
     }
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'Direccions';
+
 }

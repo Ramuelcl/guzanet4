@@ -27,18 +27,31 @@ class Categoria extends Model
         'id' => 'integer',
     ];
 
-    public function posts(): MorphToMany
+    public function mmPosts(): MorphToMany
     {
-        return $this->morphedByMany(Post::class, 'categoriaable');
+        return $this->morphedByMany(\App\Models\posts\Post::class, 'categoriaable');
     }
 
-    public function videos(): MorphToMany
+    public function mmVideos(): MorphToMany
     {
-        return $this->morphedByMany(Video::class, 'categoriaable');
+        return $this->morphedByMany(\App\Models\posts\Video::class, 'categoriaable');
     }
 
-    public function imagens(): MorphToMany
+    public function mmImagens(): MorphToMany
     {
-        return $this->morphedByMany(Imagen::class, 'categoriaable');
+        return $this->morphedByMany(\App\Models\posts\Imagen::class, 'categoriaable');
     }
+
+    public function mmMovimientos(): MorphToMany
+    {
+        return $this->morphedByMany(\App\Models\banca\Movimiento::class, 'categoriaable');
+    }
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'Categorias';
+
 }

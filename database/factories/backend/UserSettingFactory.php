@@ -3,7 +3,6 @@
 namespace Database\Factories\Backend;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Backend\UserSetting;
 
 class UserSettingFactory extends Factory
 {
@@ -12,7 +11,7 @@ class UserSettingFactory extends Factory
      *
      * @var string
      */
-    protected $model = UserSetting::class;
+    // protected $model = UserSetting::class;
 
     /**
      * Define the model's default state.

@@ -20,7 +20,7 @@ class NavLink extends Component
         return view('components.nav-link');
     }
 
-    public function isActive()
+    public function is_active()
     {
         return $this->active || request()->url() === url($this->href);
     }

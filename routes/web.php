@@ -18,12 +18,12 @@ Route::get('/', function () {
 Route::get('/register', \App\Http\Livewire\register::class);
 // Route::get('/register', \App\Http\Livewire\register::class)->layout('layouts.base');
 
+// sistema BANCA
 Route::group(['prefix' => 'banca'], function () {
-    Route::get('/import', [ImportExportController::class, 'showImportForm'])->name('banca.import.form');
-    Route::post('/import-traspaso-bancas', [ImportExportController::class, 'import'])->name('import.traspaso.bancas');
-    Route::get('/importar', [ImportExportController::class, 'showImportForm'])->name('banca.importar');
-    Route::post('/eliminar-registros-duplicados', [ImportExportController::class, 'eliminarRegistrosDuplicados'])->name('eliminar.registros.duplicados');
-    Route::post('/movimientos/pasar', [ImportExportController::class, 'pasar'])->name('banca.aMovimientos');
+    Route::get('/traspasos', [ImportExportController::class, 'showImportForm'])->name('banca.showImportForm');
+    Route::post('/traspasos', [ImportExportController::class, 'import'])->name('banca.import');
+    Route::post('/traspasos/duplicados', [ImportExportController::class, 'eliminarRegistrosDuplicados'])->name('banca.eliminar.duplicados');
+    Route::post('/traspasos/movimientos', [ImportExportController::class, 'pasar'])->name('banca.crearMovimientos');
 });
 
 // -- define idioma --

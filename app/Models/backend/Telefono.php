@@ -26,13 +26,16 @@ class Telefono extends Model
         'id' => 'integer',
     ];
 
-    public function xClientes(): MorphToMany
+    public function mmEntidads(): MorphToMany
     {
-        return $this->morphedByMany(Cliente::class, 'telefonoable');
+        return $this->morphedByMany(Entidad::class, 'telefonoable');
     }
 
-    public function xVendedors(): MorphToMany
-    {
-        return $this->morphedByMany(\App\Models\compras\Vendedor::class, 'telefonoable');
-    }
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'Telefonos';
+
 }

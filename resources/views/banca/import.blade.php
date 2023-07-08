@@ -5,27 +5,31 @@
         </h2>
     </x-slot>
 
+    {{-- controla todos los mensajes --}}
     <x-forms.msgErrorsSession :errors="$errors" :success="session('success', [])" />
 
     <!-- Formulario de importación -->
     <div class="mx-6 my-6">
-        <form method="POST" action="{{ route('import.traspaso.bancas') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('banca.import') }}" enctype="multipart/form-data">
             @csrf
+            <!-- Token CSRF para el primer formulario -->
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <!-- Contenido de la primera columna -->
                     <div class="mb-4">
                         <x-input label="Archivo:" placeholder="selecciona un archivo" type="file" name="archivo[]"
-                            id="archivo" multiple required accept=".csv, .tsv, .txt" />
+                            id="archivo" multiple required />
                     </div>
 
                     <div class="mb-4">
                         <x-native-select label="Separador de campos:" placeholder="Separador de campos"
                             wire:model="separador_campos" name="separador_campos">
                             <option value=",">Coma (,)</option>
-                            <option value=";" selected>Punto y coma (;)</option>
-                            <option value="\t">Tabulación(/t)</option>
+                            <option value=";" selectedf>Punto
+                                y coma (;)</option>
+                            <option value="\t">Tabulación(/t)
+                            </option>
                         </x-native-select>
                     </div>
 
@@ -55,7 +59,7 @@
                     <div class="mb-4">
                         <label for="linea_encabezados">Línea encabezados:</label>
                         <x-input type="text" name="linea_encabezados" id="linea_encabezados" required
-                            value="7" />
+                            value="8" />
                     </div>
 
                     <div class="mb-4 flex justify-center mt-8">
@@ -79,11 +83,12 @@
                     class="font-bold">{{ $totalDuplicados }}</span>
             </div>
             @if ($totalDuplicados)
-                <form action="{{ route('eliminar.registros.duplicados') }}" method="POST">
+                <form action="{{ route('banca.eliminar.duplicados') }}" method="POST" class="mt-4>">
                     @csrf
+                    <!-- Token CSRF para el segundo formulario -->
                     <button type="submit"
-                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Eliminar Registros
-                        Duplicados</button>
+                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Eliminar
+                        Registros Duplicados</button>
                 </form>
             @endif
 
@@ -92,9 +97,10 @@
             <div class="text-center md:text-left">
                 <span class="font-bold">Total movimientos:</span> <span class="font-bold">{{ $totalMovimientos }}</span>
             </div>
-            @if (!$totalDuplicados)
-                <form action="{{ route('banca.aMovimientos') }}" method="POST" class="mt-4">
+            @if (!$totalDuplicados && $totalImportados > $totalMovimientos)
+                <form action="{{ route('banca.crearMovimientos') }}" method="POST" class="mt-4">
                     @csrf
+                    <!-- Token CSRF para el tercer formulario -->
                     <button type="submit"
                         class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">
                         Pasar registros traspasados a la tabla de movimientos

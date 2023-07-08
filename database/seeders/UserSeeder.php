@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\backend\UserSetting;
-use App\Models\backend\Perfil;
+// use App\Models\backend\Perfil;
 
 // agregamos
 use Illuminate\Support\Str;
@@ -21,6 +21,7 @@ class UserSeeder extends Seeder
 {
     // The User model requires this trait
     use HasRoles;
+
     public function __construct()
     {
         $users = [
@@ -69,7 +70,7 @@ class UserSeeder extends Seeder
                 $language = 'fr-FR';
             }
             //guardar un registro de configuracion para el usuario
-            UserSetting::create([
+            \App\Models\backend\UserSetting::create([
                 'user_id' => $u['id'],
                 'theme' => $theme,
                 'language' => $language,
@@ -85,7 +86,7 @@ class UserSeeder extends Seeder
     public function run()
     {
         // $user = User::factory()
-        //     // ->has(UserSetting::factory()->count(1), 'userSetting')
+        //     // ->has(App\Models\backend\UserSetting::factory()->count(1), 'App\Models\backend\UserSetting')
         //     ->count(48)
         //     ->create();
 
@@ -99,7 +100,7 @@ class UserSeeder extends Seeder
         //     ->each(function ($user) use ($roles) {
         //         $user->assignRole(array_rand($roles, rand(1, 4)));
 
-        //         UserSetting::factory()->create([
+        //         App\Models\backend\UserSetting::factory()->create([
         //             'user_id' => $user->id,
         //         ]);
         //         // Perfil::factory()->create([
@@ -119,7 +120,7 @@ class UserSeeder extends Seeder
             ->each(function ($user) {
                 $user->assignRole('admin');
 
-                UserSetting::factory()->create([
+                \App\Models\backend\UserSetting::factory()->create([
                     'user_id' => $user->id,
                 ]);
                 // Perfil::factory()->create([
@@ -136,7 +137,7 @@ class UserSeeder extends Seeder
             ->each(function ($user) {
                 $user->assignRole('client');
 
-                UserSetting::factory()->create([
+                \App\Models\backend\UserSetting::factory()->create([
                     'user_id' => $user->id,
                 ]);
                 // Perfil::factory()->create([
@@ -153,7 +154,7 @@ class UserSeeder extends Seeder
             ->each(function ($user) {
                 $user->assignRole('seller');
 
-                UserSetting::factory()->create([
+                \App\Models\backend\UserSetting::factory()->create([
                     'user_id' => $user->id,
                 ]);
                 // Perfil::factory()->create([

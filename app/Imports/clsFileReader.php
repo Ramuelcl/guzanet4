@@ -14,7 +14,8 @@ class clsFileReader
 
     protected $file;
     protected $handle;
-
+    protected $encoding = 'UTF-8';
+    protected $fileType;
 
     public function __construct($filePath)
     {
@@ -68,6 +69,8 @@ class clsFileReader
 
         // Obtener la siguiente línea del archivo
         $linea  = fgets($this->handle);
+        // Convertir el tipo MIME al encoding especificado
+        // $linea = mb_convert_encoding($linea, $this->encoding); //'Windows-1252' , 'auto'
 
         // Verificar si se llegó al final del archivo
         if ($linea === false) {
@@ -77,7 +80,14 @@ class clsFileReader
         // Verificar si la línea está vacía
         if (empty(trim($linea))) {
             // Saltar a la siguiente iteración del bucle sin procesar la línea vacía
-            $this->readlines();
+            // $this->readlines();
+        }
+
+        // Convertir la línea si está en formato de cadena de bytes
+        try {
+            $linea = fncConvertirCadenaBytes($linea);
+        } catch (\Throwable $th) {
+            //throw $th;
         }
 
         // Devolver la línea completa
@@ -87,27 +97,46 @@ class clsFileReader
     public function parseLine($line, $array = [])
     {
         $arrayAsoc = [];
-        $fields = str_getcsv($line, $this->separadorCampos, $this->caracterString);
-        if ($array) {
-            foreach ($array as $key => $value) {
-                if (isset($fields[$key]))
-                    $arrayAsoc["$value"] = $fields[$key];
+
+        $fields = fncExplode($line, $this->separadorCampos, $this->finLinea);
+
+        $fields = $this->parseLine3($fields);
+        // dump(["quitó fin de linea y caracter de string" => $fields]);
+        try {
+            if ($array) {
+                foreach ($array as $key => $value) {
+                    if (isset($fields[$key]))
+                        $arrayAsoc["$value"] = $fields[$key];
+                }
+                $fields = $arrayAsoc;
             }
-            $fields = $arrayAsoc;
+        } catch (\Throwable $th) {
+            dd($th);
+            throw $th;
         }
-        // dd($array, $fields);
+        // dump(["asoció los datos" => $fields]);
+
+        return $fields;
+    }
+    public function parseLine3($fields)
+    {
+        foreach ($fields as &$field) {
+            // quitar el caracter de string EXTRA
+            $field = str_replace($this->caracterString, "", $field);
+        }
+
         return $fields;
     }
 
-    private function determinarOpcionesPorDefecto()
+    public function determinarOpcionesPorDefecto()
     {
         $extension = pathinfo($this->filePath, PATHINFO_EXTENSION);
 
         switch ($extension) {
             case 'csv':
-                $this->separadorCampos = ',';
+                $this->separadorCampos = ';';
                 $this->caracterString = '"';
-                $this->finLinea = "\n";
+                $this->finLinea = "\r\n";
                 $this->lineaEncabezados = true;
                 break;
             case 'txt':
@@ -142,6 +171,10 @@ class clsFileReader
 
         if (!empty($filePath)) {
             if (file_exists($filePath)) {
+
+                // Obtener el tipo MIME del archivo
+                $this->fileType = $this->getFileMimeType($filePath);
+
                 $this->file = $filePath;
                 $this->handle = fopen($this->file, 'r');
 
@@ -166,5 +199,14 @@ class clsFileReader
             $this->handle = null;
             $this->file = null;
         }
+    }
+
+    protected function getFileMimeType($filePath)
+    {
+        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+        $fileType = finfo_file($fileInfo, $filePath);
+        finfo_close($fileInfo);
+
+        return $fileType;
     }
 }
