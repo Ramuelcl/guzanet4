@@ -1,19 +1,19 @@
 created:
-    - database/migrations/2023_07_02_174611_create_tablas_table.php
-    - database/migrations/2023_07_02_174612_create_categorias_table.php
-    - database/migrations/2023_07_02_174613_create_marcadors_table.php
-    - database/migrations/2023_07_02_174614_create_perfils_table.php
-    - database/migrations/2023_07_02_174615_create_user_settings_table.php
-    - database/migrations/2023_07_02_174616_create_telefonos_table.php
-    - database/migrations/2023_07_02_174617_create_pais_table.php
-    - database/migrations/2023_07_02_174618_create_ciudads_table.php
-    - database/migrations/2023_07_02_174619_create_direccions_table.php
-    - database/migrations/2023_07_02_174620_create_entidads_table.php
-    - database/migrations/2023_07_02_174621_create_traspasos_table.php
-    - database/migrations/2023_07_02_174622_create_movimientos_table.php
-    - database/migrations/2023_07_02_174623_create_categoriaables_table.php
-    - database/migrations/2023_07_02_174624_create_marcadorables_table.php
-    - database/migrations/2023_07_02_174625_create_telefonoables_table.php
+    - database/migrations/2023_07_15_054309_create_tablas_table.php
+    - database/migrations/2023_07_15_054310_create_categorias_table.php
+    - database/migrations/2023_07_15_054311_create_marcadors_table.php
+    - database/migrations/2023_07_15_054312_create_perfils_table.php
+    - database/migrations/2023_07_15_054313_create_user_settings_table.php
+    - database/migrations/2023_07_15_054314_create_telefonos_table.php
+    - database/migrations/2023_07_15_054315_create_pais_table.php
+    - database/migrations/2023_07_15_054316_create_ciudads_table.php
+    - database/migrations/2023_07_15_054317_create_direccions_table.php
+    - database/migrations/2023_07_15_054318_create_entidads_table.php
+    - database/migrations/2023_07_15_054319_create_traspasos_table.php
+    - database/migrations/2023_07_15_054320_create_movimientos_table.php
+    - database/migrations/2023_07_15_054321_create_categoriaables_table.php
+    - database/migrations/2023_07_15_054322_create_marcadorables_table.php
+    - database/migrations/2023_07_15_054323_create_telefonoables_table.php
     - app/Models/backend/Tabla.php
     - app/Models/backend/Categoria.php
     - app/Models/backend/Marcador.php
@@ -29,18 +29,18 @@ created:
 models:
     User: { name: 'string:32', email: 'string:64', email_verified_at: 'datetime nullable', password: 'string nullable', two_factor_secret: 'text nullable', two_factor_recovery_codes: 'text nullable', two_factor_confirmed_at: 'datetime nullable', remember_token: 'string:100 nullable', current_team_id: 'biginteger unsigned nullable', profile_photo_path: 'string:128 nullable', role: 'string:20', is_active: 'boolean default:1' }
     backend\Categoria: { nombre: 'string:45 nullable default:null unique', babosa: "string:45 nullable default:null charset:'utf8'", softdeletes: softDeletes, relationships: { morphedByMany: 'Post:mmPost, Video:mmVideo, Imagen:mmImagen, Movimiento:mmMovimiento' } }
-    backend\Ciudad: { id: bigIncrements, nombre: "string:64 nullable default:null charset:'utf8mb4'", pais_id: 'foreignId:backend_pais.id', timestamps: false, softdeletes: softDeletes, relationships: { belongsTo: 'Direccion:ciudad_direcciones' } }
-    backend\Direccion: { id: bigIncrements, entidad_id: 'foreignId:backend_entidad.id', direccion: "string:128 charset:'utf8mb4'", ciudad_id: 'foreignId:backend_ciudad.id', codigo_postal: "string:6 nullable default:0 charset:'utf8mb4'", region: "string:64 nullable default:null charset:'utf8mb4'", relationships: { belongsTo: 'Entidad:direccion_entidad_id_foreign, Ciudad:direccion_ciudad_id_foreign' }, softdeletes: softDeletes, timestamps: timestamps }
-    backend\Entidad: { id: bigIncrements, razonSocial: "string:128 nullable default:null charset:'utf8mb4'", nombres: "string:80 charset:'utf8mb4'", apellidos: "string:80 charset:'utf8mb4'", is_active: 'boolean nullable default:true', eMail: "string:255 nullable default:null unique charset:'utf8mb4'", tipo: 'foreignId:backend_tablas.tabla nullable default:null', timestamps: timestamps, softdeletes: softDeletes, relationships: { belongsTo: Tabla } }
+    backend\Ciudad: { pais_id: 'foreign:paises.id', nombre: "string:64 nullable default:null charset:'utf8mb4'", timestamps: false, softdeletes: softDeletes, relationships: { hasOne: 'Pais:pais_ciudades', hasMany: 'Direccion:ciudad_direcciones' } }
+    backend\Direccion: { entidad_id: 'foreign:entidades.id', ciudad_id: 'foreign:ciudades.id default:0', direccion: "string:128 charset:'utf8mb4'", codigo_postal: "string:6 nullable default:0 charset:'utf8mb4'", region: "string:64 nullable default:null charset:'utf8mb4'", relationships: { belongsTo: 'Entidad:direccion_entidad_id_foreign Ciudad:direccion_ciudad_id_foreign' }, softdeletes: softDeletes, timestamps: timestamps }
+    backend\Entidad: { razonSocial: "string:128 nullable default:null charset:'utf8mb4'", nombres: "string:80 charset:'utf8mb4' nullable default:null", apellidos: "string:80 charset:'utf8mb4'  nullable default:null", is_active: 'boolean nullable default:true', eMail: "string:255 nullable default:null unique charset:'utf8mb4'", tipo: 'foreignId:backend_tablas.tabla nullable default:null', timestamps: timestamps, softdeletes: softDeletes, relationships: { belongsTo: 'Tabla:tablas', hasMany: 'Direccion:entidad_direcciones_id_foreign' } }
     backend\Marcador: { nombre: "string:32 charset:'utf8'", babosa: "string:45 nullable default:null charset:'utf8'", hexa: "string:7 unique default:'#' charset:'utf8'", rgb: "string:20 nullable default:null charset:'utf8'", metadata: 'json nullable', is_active: 'boolean nullable default:true', softdeletes: softDeletes, relationships: { morphedByMany: 'Post:mmPost, Video:mmVideo, Imagen:mmImagen, Movimiento:mmMovimiento, Categoria:mmCategoria' } }
-    backend\Pais: { id: bigIncrements, nombre: "string:64 nullable default:null charset:'utf8mb4'", bandera: "string:128 nullable default:null charset:'utf8mb4'", idioma: "string:64 nullable default:null charset:'utf8mb4'", idioma_web: "string:5 nullable default:null charset:'utf8mb4'", timestamps: false, softdeletes: softDeletes, relationships: { BelongsTo: 'Ciudad:pais_ciudades' } }
+    backend\Pais: { nombre: "string:64 nullable default:null charset:'utf8mb4'", bandera: "string:128 nullable default:null charset:'utf8mb4'", idioma: "string:64 nullable default:null charset:'utf8mb4'", idioma_web: "string:5 nullable default:null charset:'utf8mb4'", timestamps: false, softdeletes: softDeletes, relationships: { belongsTo: 'Ciudad:pais_ciudades' } }
     backend\Perfil: { id: false, user_id: 'id foreign:users.id primary', edad: unsignedTinyInteger, profesion: 'string:3 nullable default:null comment:"despues cambiar a tabla" charset:''utf8''', biografia: "longtext default:null charset:'utf8'", website: "string:128 default:null charset:'utf8'", softdeletes: softDeletes, relationships: { hasOne: User } }
     backend\Tabla: { id: false, tabla: bigInteger, tabla_id: bigInteger, nombre: "string:45 charset:'utf8mb4'", descripcion: "string:128 nullable default:null charset:'utf8mb4'", is_active: 'boolean nullable default:true', valor1: "string:128 nullable default:null charset:'utf8mb4'", valor2: "string:128 nullable default:null charset:'utf8mb4'", valor3: 'boolean nullable default:false', indexes: [{ primary: 'tabla, tabla_id' }, { index: nombre }], softdeletes: softDeletes }
-    backend\Telefono: { tipo: 'string:2', numero: 'string:13', relationships: { morphedByMany: 'Entidad:mmEntidad' } }
+    backend\Telefono: { entidad_id: 'foreign:entidades.id', tipo: 'string:2', numero: 'string:15', relationships: { morphedByMany: 'Entidad:mmEntidad' } }
     backend\UserSetting: { id: false, user_id: 'id foreign:users.id', theme: "string:20 default:'dark' charset:'utf8'", language: "string:5 default:'fr-FR' charset:'utf8'", autologin: 'boolean default:true', ipVisitor: "string:45 nullable default:null charset:'utf8'", options: 'json nullable default:null', device: "string:17 nullable default:null charset:'utf8'", softdeletes: softDeletes, relationships: { belongsTo: User } }
     mdlData: {  }
     posts\Imagen: { name: "string:32 charset:'utf8'", user_id: 'id foreign:users.id', url: "string:128 charset:'utf8'", softdeletes: softDeletes, relationships: { morphedByMany: 'Marcador:mmMarcador, Categoria:mmCategoria,' } }
     posts\Post: { user_id: 'id foreign:users.id', name: "string:32 charset:'utf8'", contenido: "longtext nullable charset:'utf8'", publicado: 'timestamp nullable useCurrent', actualizado: 'timestamp nullable useCurrent useCurrentOnUpdate', softdeletes: softDeletes, relationships: { morphedByMany: 'Marcador:mmMarcador, Categoria:mmCategoria,' } }
     posts\Video: { name: "string:32 charset:'utf8'", user_id: 'id foreign:users.id', url: "string:128 charset:'utf8'", softdeletes: softDeletes, relationships: { morphedByMany: 'Marcador:mmMarcador, Categoria:mmCategoria,' } }
-    banca\Traspaso: { date: 'string:10 nullable default:0', libelle: text, montantEUROS: 'string:12 nullable default:0', montantFRANCS: 'string:12 nullable default:0', Date_Libelle_montantEUROS_montantFRANCS: "text charset:'utf8'", NomArchTras: 'string:100 nullable default:null', IdArchMov: 'string:20 nullable default:null', timestamps: timestamps }
+    banca\Traspaso: { date: 'string:10 nullable default:0', libelle: text, montantEUROS: 'string:12 nullable default:0', montantFRANCS: 'string:12 nullable default:0', NomArchTras: 'string:100 nullable default:null', IdArchMov: 'string:20 nullable default:null', timestamps: timestamps }
     banca\Movimiento: { cuenta: 'string:12 nullable default:5578733W020', tipo: 'string:3 nullable default:CCP', dateMouvement: 'date nullable default_format:"Y-m-d"', libelle: text, montant: 'decimal:8,2', francs: 'decimal:8,2', cliente_id: 'bigInteger nullable default:null', releve: 'bigInteger nullable default:null', dateReleve: 'date nullable default_format:"Y-m-d"', estado: 'tinyInteger nullable default:0', conciliada: 'tinyInteger nullable default:0', indexes: [{ index: 'cuenta, dateMouvement' }], softdeletes: softDeletes, timestamps: timestamps }

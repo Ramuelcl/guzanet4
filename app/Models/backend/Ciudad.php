@@ -5,6 +5,8 @@ namespace App\Models\backend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ciudad extends Model
@@ -25,9 +27,29 @@ class Ciudad extends Model
      */
     protected $guarded = [];
 
-    public function ciudadDirecciones(): BelongsTo
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'integer',
+        'pais_id' => 'integer',
+    ];
+
+    public function paisCiudades(): HasOne
     {
-        return $this->belongsTo(Direccion::class);
+        return $this->hasOne(Pais::class);
+    }
+
+    public function ciudadDirecciones(): HasMany
+    {
+        return $this->hasMany(Direccion::class);
+    }
+
+    public function pais(): BelongsTo
+    {
+        return $this->belongsTo(Pais::class);
     }
 
     /**
@@ -35,6 +57,5 @@ class Ciudad extends Model
      *
      * @var string
      */
-    protected $table = 'Ciudads';
-
+    protected $table = 'Ciudades';
 }

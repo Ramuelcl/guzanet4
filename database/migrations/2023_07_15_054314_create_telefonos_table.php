@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    protected $table = 'ciudads';
+    protected $table = 'telefonos';
     /**
      * Run the migrations.
      */
@@ -16,9 +16,10 @@ return new class extends Migration
 
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 64)->nullable()->default(null)->charset('utf8mb4');
-            $table->string('pais_id');
-            $table->softDeletes();
+            $table->foreignId('entidad_id')->constrained('entidades')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string('tipo', 2);
+            $table->string('numero', 20);
+            $table->timestamps();
         });
 
         Schema::enableForeignKeyConstraints();

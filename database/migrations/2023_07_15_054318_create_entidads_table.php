@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    protected $table = 'pais';
+    protected $table = 'entidades';
     /**
      * Run the migrations.
      */
@@ -16,11 +16,15 @@ return new class extends Migration
 
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 64)->nullable()->default(null)->charset('utf8mb4');
-            $table->string('bandera', 128)->nullable()->default(null)->charset('utf8mb4');
-            $table->string('idioma', 64)->nullable()->default(null)->charset('utf8mb4');
-            $table->string('idioma_web', 5)->nullable()->default(null)->charset('utf8mb4');
+            $table->string('razonSocial', 128)->nullable()->default(null)->charset('utf8mb4');
+            $table->string('nombres', 80)->charset('utf8mb4')->nullable()->default(null);
+            $table->string('apellidos', 80)->charset('utf8mb4')->nullable()->default(null);
+            $table->boolean('is_active')->nullable()->default(true);
+            $table->unsignedBigInteger('email_id');
+            $table->string('tipo')->nullable()->default(null);
+            $table->timestamps();
             $table->softDeletes();
+            $table->foreign('email_id')->references('id')->on('emails')->onDelete('cascade');
         });
 
         Schema::enableForeignKeyConstraints();

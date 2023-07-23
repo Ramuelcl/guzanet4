@@ -25,6 +25,15 @@ class Pais extends Model
      */
     protected $guarded = [];
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'integer',
+    ];
+
     public function paisCiudades(): BelongsTo
     {
         return $this->belongsTo(Ciudad::class);
@@ -35,6 +44,5 @@ class Pais extends Model
      *
      * @var string
      */
-    protected $table = 'Paiss';
-
+    protected $table = 'Paises';
 }

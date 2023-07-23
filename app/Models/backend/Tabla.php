@@ -36,4 +36,8 @@ class Tabla extends Model
      */
     protected $table = 'Tablas';
 
+    public function entidades()
+    {
+        return $this->morphMany(Entidad::class, 'tabla');
+    }
 }

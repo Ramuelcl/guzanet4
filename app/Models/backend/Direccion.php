@@ -18,12 +18,28 @@ class Direccion extends Model
      */
     protected $guarded = [];
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'integer',
+        'entidad_id' => 'integer',
+        'ciudad_id' => 'integer',
+    ];
+
     public function direccionEntidad(): BelongsTo
     {
         return $this->belongsTo(Entidad::class);
     }
 
-    public function direccionCiudad(): BelongsTo
+    public function entidad(): BelongsTo
+    {
+        return $this->belongsTo(Entidad::class);
+    }
+
+    public function ciudad(): BelongsTo
     {
         return $this->belongsTo(Ciudad::class);
     }
@@ -33,6 +49,5 @@ class Direccion extends Model
      *
      * @var string
      */
-    protected $table = 'Direccions';
-
+    protected $table = 'Direcciones';
 }

@@ -5,6 +5,7 @@ namespace App\Models\backend;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Entidad extends Model
@@ -24,12 +25,18 @@ class Entidad extends Model
      * @var array
      */
     protected $casts = [
+        'id' => 'integer',
         'is_active' => 'boolean',
     ];
 
-    public function tabla(): BelongsTo
+    public function tablas(): BelongsTo
     {
         return $this->belongsTo(Tabla::class);
+    }
+
+    public function entidadDireccionesIdForeigns(): HasMany
+    {
+        return $this->hasMany(Direccion::class);
     }
 
     /**
@@ -37,6 +44,10 @@ class Entidad extends Model
      *
      * @var string
      */
-    protected $table = 'Entidads';
+    protected $table = 'Entidades';
 
+    public function tabla()
+    {
+        return $this->morphTo(Tabla::class, 'tabla', 'tabla_id');
+    }
 }

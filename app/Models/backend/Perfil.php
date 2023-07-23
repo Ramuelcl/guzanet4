@@ -34,16 +34,10 @@ class Perfil extends Model
         return $this->hasOne(\App\Models\User::class);
     }
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(\App\Models\User::class);
-    }
-
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'Perfils';
-
+    protected $table = 'Perfiles';
 }

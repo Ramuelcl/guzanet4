@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    protected $table = 'telefonos';
+    protected $table = 'perfiles';
     /**
      * Run the migrations.
      */
@@ -15,10 +15,13 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create($this->table, function (Blueprint $table) {
-            $table->id();
-            $table->string('tipo', 2);
-            $table->string('numero', 13);
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate()->primary();
+            $table->unsignedTinyInteger('edad');
+            $table->string('profesion', 3)->nullable()->default(null)->comment('despues cambiar a tabla')->charset('utf8');
+            $table->longText('biografia')->default(null)->charset('utf8');
+            $table->string('website', 128)->default(null)->charset('utf8');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

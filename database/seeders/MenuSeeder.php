@@ -86,8 +86,8 @@ class MenuSeeder extends Seeder
                         'is_active' => true,
                     ],
                     [
-                        'nombre' => 'Movimientos',
-                        'url' => '/banca/movimientos',
+                        'nombre' => 'Clientes',
+                        'url' => '/banca/clientes',
                         'is_active' => true,
                     ],
                 ]

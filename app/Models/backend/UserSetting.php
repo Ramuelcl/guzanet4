@@ -39,5 +39,5 @@ class UserSetting extends Model
      *
      * @var string
      */
-    protected $table = 'user_settings';
+    protected $table = 'User_Settings';
 }

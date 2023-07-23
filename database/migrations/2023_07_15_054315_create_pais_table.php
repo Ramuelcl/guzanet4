@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    protected $table = 'perfils';
+    protected $table = 'paises';
     /**
      * Run the migrations.
      */
@@ -15,12 +15,11 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create($this->table, function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate()->primary();
-            $table->unsignedTinyInteger('edad');
-            $table->string('profesion', 3)->nullable()->default(null)->comment('despues cambiar a tabla')->charset('utf8');
-            $table->longText('biografia')->default(null)->charset('utf8');
-            $table->string('website', 128)->default(null)->charset('utf8');
-            $table->timestamps();
+            $table->id();
+            $table->string('nombre', 64)->nullable()->default(null)->charset('utf8mb4');
+            $table->string('bandera', 128)->nullable()->default(null)->charset('utf8mb4');
+            $table->string('idioma', 64)->nullable()->default(null)->charset('utf8mb4');
+            $table->string('idioma_web', 5)->nullable()->default(null)->charset('utf8mb4');
             $table->softDeletes();
         });
 

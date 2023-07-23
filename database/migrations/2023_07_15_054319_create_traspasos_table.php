@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    protected $table = 'marcadors';
+    protected $table = 'traspasos';
     /**
      * Run the migrations.
      */
@@ -16,14 +16,13 @@ return new class extends Migration
 
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 32)->charset('utf8');
-            $table->string('babosa', 45)->nullable()->default(null)->charset('utf8');
-            $table->string('hexa', 7)->unique()->default('#')->charset('utf8');
-            $table->string('rgb', 20)->nullable()->default(null)->charset('utf8');
-            $table->json('metadata')->nullable();
-            $table->boolean('is_active')->nullable()->default(true);
+            $table->string('date', 10)->nullable()->default('0');
+            $table->text('libelle');
+            $table->string('montantEUROS', 12)->nullable()->default('0');
+            $table->string('montantFRANCS', 12)->nullable()->default('0');
+            $table->string('NomArchTras', 100)->nullable()->default(null);
+            $table->string('IdArchMov', 20)->nullable()->default(null);
             $table->timestamps();
-            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();

@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Imports\TraspasoBancaImport;
+use App\Models\backend\Ciudad;
+use App\Models\backend\Direccion;
+use App\Models\backend\Entidad;
+use App\Models\backend\Pais;
+use App\Models\backend\Telefono;
+use App\Models\banca\Client;
 use App\Models\banca\Traspaso;
 use App\Models\banca\Movimiento;
 use Carbon\Carbon;
@@ -39,7 +45,7 @@ class ImportExportController extends Controller
         $totalImportados = Traspaso::count();
         $totalMovimientos = Traspaso::whereNotNull('IdArchMov')->count();
 
-        $registrosDuplicados = DB::table('traspasos')
+        $registrosDuplicados = DB::table('traspasos_banca')
             ->select(DB::raw("GROUP_CONCAT(CONCAT(Date, Libelle, MontantEUROS) SEPARATOR ', ') AS concat"))
             ->groupBy('Date', 'Libelle', 'MontantEUROS')
             ->havingRaw('COUNT(*) > 1')
@@ -139,125 +145,87 @@ class ImportExportController extends Controller
         return redirect()->back();
     }
 
-    // public function import2(Request $request)
-    // {
-    //     // dd($request);
+    public function clientes()
+    {
 
-    //     // Validar el archivo enviado por el formulario
-    //     $request->validate([
-    //         'archivo' => 'required|array',
-    //         'archivo.*' => 'file|mimes:csv,txt,tsv|max:2048',
-    //     ], [
-    //         'archivo.required' => 'El campo archivo es requerido.',
-    //         'archivo.array' => 'El campo archivo debe ser un arreglo.',
-    //         'archivo.*.file' => 'El archivo seleccionado no es válido.',
-    //         'archivo.*.mimes' => 'El archivo debe tener una de las siguientes extensiones: csv, txt, tsv.',
-    //         'archivo.*.max' => 'El tamaño máximo permitido para el archivo es de 2048 KB.',
-    //     ]);
-    //     $archivos = $request->file('archivo');
-    //     foreach ($archivos as $archivo) {
+        // Obtener los registros de la tabla "client" en SQLite
+        $clients = Client::all();
 
-    //         // Obtener el nombre original del archivo
-    //         $nombreOriginal = $archivo->getClientOriginalName();
-    //         // $extension = $archivo->getClientOriginalExtension();
 
-    //         // dd($archivo, $nombreOriginal, $extension);
+        $pais = new Pais();
+        $pais->nombre = "Francia";
+        // Asignar otros valores según corresponda
+        $pais->save();
 
-    //         // Verificar si el archivo ya ha sido importado
-    //         if ($this->checkFileImported($nombreOriginal)) {
-    //             // dump(['Archivo ya traspasado: ' => $archivo]);
-    //             $mensajes['error'] = "Archivo ya traspasado: $nombreOriginal";
-    //             session()->put('error', $mensajes);
-    //         } else {
-    //             //
-    //         }
-    //     }
+        // Recorrer los registros y transferir los datos a las tablas correspondientes en MySQL
+        foreach ($clients as $client) {
+            // Crear una entidad en la tabla "entidades" en MySQL
+            $entidad = new Entidad();
+            $entidad->nombres = $client->client;
+            $entidad->eMail = $client->email;
+            $entidad->tipo = 'Cliente';
+            $entidad->is_active = 0;
+            $primerosDosCaracteres = substr($client->client, 0, 2);
 
-    //     // $archivo = '/ruta/al/archivo'; // Ruta completa al archivo
-    //     $rutaArchivo = $archivo->getRealPath();        // Obtener la extensión del archivo
-    //     $extension = $archivo->getClientOriginalExtension(); // pathinfo($archivo, PATHINFO_EXTENSION);
+            if ((int)$primerosDosCaracteres > 0)
+                $entidad->is_active = 1;
+            // Asignar otros valores según corresponda
+            try {
+                //code...
+                $entidad->save();
+            } catch (\Throwable $th) {
+                //throw $th;
+                continue;
+            }
+            // Crear una dirección en la tabla "ciudades" en MySQL
+            $ciudadNombre = ucwords(trim(preg_replace('/[0-9]/', '', trim($client->addr2))));
+            if (strlen(trim($ciudadNombre)) < 5)
+                $ciudadNombre = "Paris";
+            $ciudadReg = Ciudad::where('nombre', $ciudadNombre)->first();
+            if ($ciudadReg) {
+                $ciudadId = $ciudadReg->id;
+            } else {
+                $ciudad = new Ciudad();
+                $ciudad->pais_id = $pais->id;
+                $ciudad->nombre = $ciudadNombre;
+                // Asignar otros valores según corresponda
+                $ciudad->save();
+                $ciudadId = $ciudad->id;
+            }
 
-    //     switch ($extension) {
-    //         case 'tsv':
-    //             $fieldsTerminatedBy = '\t'; // Separador de campos para archivos TSV
-    //             break;
-    //         case 'csv':
-    //             $fieldsTerminatedBy = ';'; // Separador de campos para archivos CSV
-    //             break;
-    //         case 'txt':
-    //             $fieldsTerminatedBy = ','; // Separador de campos para archivos TXT
-    //             break;
-    //         default:
-    //             // Extensión de archivo no soportada
-    //             die('Extensión de archivo no soportada');
-    //     }
-
-    //     $linesTerminatedBy = '\r\n'; // Separador de líneas por defecto
-
-    //     // Leer el archivo y buscar la línea de subtítulos
-    //     $handle = fopen($archivo, 'r');
-    //     $ignoreLines = 0; // Contador de líneas a ignorar antes de la línea de subtítulos
-    //     $subtitlesLine = '';
-    //     while (($line = fgets($handle)) !== false) {
-    //         if (strpos($line, "Date\tLibell") === 0 || strpos($line, "Date;Libell") === 0) {
-    //             $subtitlesLine = $line;
-    //             break;
-    //         }
-    //         $ignoreLines++;
-    //     }
-    //     fclose($handle);
-
-    //     // Verificar si se encontró la línea de subtítulos
-    //     if (empty($subtitlesLine)) {
-    //         die('No se encontró la línea de subtítulos en el archivo');
-    //     } else {
-    //         $subtitlesLine = str_replace(['(', ')'], '', $subtitlesLine);
-    //         $subtitlesLine = fncConvertirCadenaBytes($subtitlesLine);
-    //         // dump($subtitlesLine);
-    //         $subtitlesLine = fncCambiaCaracteresEspeciales($subtitlesLine);
-    //         // dump($subtitlesLine);
-    //         $fieldNames = fncExplode($subtitlesLine, $fieldsTerminatedBy, $linesTerminatedBy);
-    //         // dd($fieldNames);
-    //     }
-
-    //     // dump($fieldNames, $fieldsTerminatedBy, $linesTerminatedBy);
-
-    //     // Escapar los caracteres extraños en los nombres de campo
-    //     // $escapedFieldNames = array_map(function ($fieldName) {
-    //     //     // $fieldName = mb_convert_encoding($fieldName, 'HTML-ENTITIES', 'UTF-8');
-    //     //     // $fieldName = htmlentities($fieldName, ENT_QUOTES, 'UTF-8');
-    //     //     $fieldName = fncCambiaCaracteresEspeciales($fieldName);
-    //     //     return '`' . str_replace('`', '``', $fieldName) . '`';
-    //     // }, $fieldNames);
-
-    //     // Construir la parte SET de la instrucción SQL
-    //     $setClause = '';
-    //     foreach ($fieldNames as $index => $fieldName) {
-    //         $setClause .= "`$fieldName`" . " = @" . $fieldName;
-    //         if ($index < count($fieldNames) - 1) {
-    //             $setClause .= ", ";
-    //         }
-    //     }
-    //     // dd($setClause);
-
-    //     // Construir la instrucción SQL completa con el número de líneas a ignorar
-    //     dump($rutaArchivo, 'C:/Users/ramue/OneDrive/Dokument/banca/5578733W0201312047368499.tsv');
-    //     $sql = "LOAD DATA INFILE 'C:/Users/ramue/OneDrive/Dokument/banca/5578733W0201312047368499.tsv'
-    //     INTO TABLE traspasos
-    //     FIELDS TERMINATED BY '$fieldsTerminatedBy'
-    //     LINES TERMINATED BY '$linesTerminatedBy'
-    //     IGNORE $ignoreLines LINES
-    //     SET
-    //         Date = @Date,
-    //         Libelle = @Libelle,
-    //         MontantEUROS = @MontantEUROS,
-    //         MontantFRANCS = @MontantFRANCS,
-    //         NomArchTras = '$nombreOriginal'";
-
-    //     // Ejecutar la instrucción SQL en la base de datos
-    //     DB::connection()->getpdo()->exec($sql);
-    // }
-
+            // Crear una dirección en la tabla "direcciones" en MySQL
+            if ($client->addr1) {
+                $direccion = new Direccion();
+                $direccion->entidad_id = $entidad->id;
+                $direccion->direccion = $client->addr1;
+                $direccion->ciudad_id = $ciudadId;
+                $direccion->codigo_postal = trim(preg_replace('/[^0-9]/', '', $client->addr2));
+                $direccion->region = $client->addr3;
+                // Asignar otros valores según corresponda
+                $direccion->save();
+            }
+            // Crear un teléfono en la tabla "telefonos" en MySQL
+            if ($client->phone) {
+                $telefono = new Telefono();
+                $paso = trim(str_replace(' ', '', $client->phone));
+                $telefono->entidad_id = $entidad->id;
+                $telefono->tipo = '1';
+                $telefono->numero = $paso;
+                // Asignar otros valores según corresponda
+                $telefono->save();
+            }
+            if ($client->fax) {
+                $telefono = new Telefono();
+                $telefono->tipo = '2';
+                $telefono->entidad_id = $entidad->id;
+                $paso = trim(str_replace(' ', '', $client->fax));
+                $telefono->numero = $paso;
+                // Asignar otros valores según corresponda
+                $telefono->save();
+            }
+        }
+        return redirect()->back()->with('success', 'tabla clientes traspasada');
+    }
     public function checkFileImported($nombreArchivo)
     {
         try {
@@ -286,7 +254,7 @@ class ImportExportController extends Controller
         return redirect()->back()->with('success', 'Registros duplicados eliminados correctamente');
     }
 
-    public function pasar()
+    public function TraspasoAMovimientos()
     {
         // Obtener los registros sin idArchMov de la tabla traspasos
         try {
@@ -298,6 +266,7 @@ class ImportExportController extends Controller
 
                     try {
                         $fechaFormateada = $this->castearDato($registro->Date, 'date1');
+                        dd($fechaFormateada);
                         $montoFormateado = $this->castearDato($registro->MontantEUROS, 'float');
                         // dd(['fecha' => $fechaFormateada, 'monto' => $montoFormateado]);
                         $movimiento->dateMouvement = $fechaFormateada;

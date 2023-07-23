@@ -21,11 +21,15 @@ Route::get('/register', \App\Http\Livewire\register::class);
 // sistema BANCA
 Route::group(['prefix' => 'banca'], function () {
     Route::get('/traspasos', [ImportExportController::class, 'showImportForm'])->name('banca.showImportForm');
-    Route::post('/traspasos', [ImportExportController::class, 'import'])->name('banca.import');
+    Route::get('/clientes', [ImportExportController::class, 'clientes'])->name('banca.clientes');
     Route::post('/traspasos/duplicados', [ImportExportController::class, 'eliminarRegistrosDuplicados'])->name('banca.eliminar.duplicados');
-    Route::post('/traspasos/movimientos', [ImportExportController::class, 'pasar'])->name('banca.crearMovimientos');
+    Route::post('/traspasos/movimientos', [ImportExportController::class, 'TraspasoAMovimientos'])->name('banca.crearMovimientos');
 });
 
+// sistema tablas
+Route::group(['prefix' => 'admin'], function () {
+    Route::get('/livewire-entidades', [LivewireController::class, 'entidades'])->name('livewire.entidades');
+});
 // -- define idioma --
 Route::get('/greeting/{locale}', function ($locale) {
     if (!in_array($locale, ['en', 'es', 'fr'])) {

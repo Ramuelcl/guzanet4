@@ -4,6 +4,7 @@ namespace App\Models\backend;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Telefono extends Model
@@ -24,11 +25,17 @@ class Telefono extends Model
      */
     protected $casts = [
         'id' => 'integer',
+        'entidad_id' => 'integer',
     ];
 
     public function mmEntidads(): MorphToMany
     {
         return $this->morphedByMany(Entidad::class, 'telefonoable');
+    }
+
+    public function entidad(): BelongsTo
+    {
+        return $this->belongsTo(Entidad::class);
     }
 
     /**
@@ -37,5 +44,4 @@ class Telefono extends Model
      * @var string
      */
     protected $table = 'Telefonos';
-
 }

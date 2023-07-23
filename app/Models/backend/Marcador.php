@@ -59,6 +59,5 @@ class Marcador extends Model
      *
      * @var string
      */
-    protected $table = 'Marcadors';
-
+    protected $table = 'Marcadores';
 }

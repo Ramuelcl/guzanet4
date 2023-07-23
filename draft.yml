@@ -83,13 +83,14 @@ models:
   #     morphedByMany: Marcador:mmMarcador, Categoria:mmCategoria,
 
   backend\Telefono:
+    entidad_id: foreign:entidades.id
     tipo: string:2
-    numero: string:13
+    numero: string:20
+    # timestamps: false
     relationships:
       morphedByMany: Entidad:mmEntidad
 
   backend\Pais:
-    id: bigIncrements
     nombre: string:64 nullable default:null charset:'utf8mb4'
     bandera: string:128 nullable default:null charset:'utf8mb4'
     idioma: string:64 nullable default:null charset:'utf8mb4'
@@ -97,48 +98,48 @@ models:
     timestamps: false
     softDeletes: true
     relationships:
-      BelongsTo: Ciudad:pais_ciudades
+      belongsTo: Ciudad:pais_ciudades
 
   backend\Ciudad:
-    id: bigIncrements
+    pais_id: foreign:paises.id
     nombre: string:64 nullable default:null charset:'utf8mb4'
-    pais_id: foreignId:backend_pais.id
     timestamps: false
     softDeletes: true
     relationships:
-      belongsTo: Direccion:ciudad_direcciones
+      hasOne: Pais:pais_ciudades
+      hasMany: Direccion:ciudad_direcciones
 
   backend\Direccion:
-    id: bigIncrements
-    entidad_id: foreignId:backend_entidad.id
+    entidad_id: foreign:entidades.id
+    ciudad_id: foreign:ciudades.id default:0
     direccion: string:128 charset:'utf8mb4'
-    ciudad_id: foreignId:backend_ciudad.id
     codigo_postal: string:6 nullable default:0 charset:'utf8mb4'
     region: string:64 nullable default:null charset:'utf8mb4'
     relationships:
-      belongsTo: Entidad:direccion_entidad_id_foreign, Ciudad:direccion_ciudad_id_foreign
+      belongsTo:
+        Entidad:direccion_entidad_id_foreign
+        Ciudad:direccion_ciudad_id_foreign
     softDeletes: true
     timestamps: true
 
   backend\Entidad:
-    id: bigIncrements
     razonSocial: string:128 nullable default:null charset:'utf8mb4'
-    nombres: string:80 charset:'utf8mb4'
-    apellidos: string:80 charset:'utf8mb4'
+    nombres: string:80 charset:'utf8mb4' nullable default:null
+    apellidos: string:80 charset:'utf8mb4'  nullable default:null
     is_active: boolean nullable default:true
     eMail: string:255 nullable default:null unique charset:'utf8mb4'
     tipo: foreignId:backend_tablas.tabla nullable default:null
     timestamps: true
     softDeletes: true
     relationships:
-      belongsTo: Tabla
+      belongsTo: Tabla:tablas
+      hasMany: Direccion:entidad_direcciones_id_foreign
 
   banca\Traspaso:
     date: string:10 nullable default:0
     libelle: text
     montantEUROS: string:12 nullable default:0
     montantFRANCS: string:12 nullable default:0
-    Date_Libelle_montantEUROS_montantFRANCS: text charset:'utf8'
     NomArchTras: string:100 nullable default:null
     IdArchMov: string:20 nullable default:null
     timestamps: true

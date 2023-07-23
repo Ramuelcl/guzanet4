@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    protected $table = 'traspasos';
+    protected $table = 'direcciones';
     /**
      * Run the migrations.
      */
@@ -16,14 +16,13 @@ return new class extends Migration
 
         Schema::create($this->table, function (Blueprint $table) {
             $table->id();
-            $table->string('date', 10)->nullable()->default('0');
-            $table->text('libelle');
-            $table->string('montantEUROS', 12)->nullable()->default('0');
-            $table->string('montantFRANCS', 12)->nullable()->default('0');
-            $table->text('Date_Libelle_montantEUROS_montantFRANCS')->charset('utf8');
-            $table->string('NomArchTras', 100)->nullable()->default(null);
-            $table->string('IdArchMov', 20)->nullable()->default(null);
+            $table->foreignId('entidad_id')->constrained('entidades')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('ciudad_id')->constrained('ciudades')->cascadeOnDelete()->cascadeOnUpdate()->default(0);
+            $table->string('direccion', 128)->charset('utf8mb4');
+            $table->string('codigo_postal', 6)->nullable()->default('0')->charset('utf8mb4');
+            $table->string('region', 64)->nullable()->default(null)->charset('utf8mb4');
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::enableForeignKeyConstraints();
