@@ -9,9 +9,9 @@
         <form wire:submit.prevent="submitForm">
             <div class="container mx-auto mt-8">
                 <livewire:components.input-component idName="nombre" placeholder="Nombre" />
-                <div class="container w-60">
+                <div class="container">
                     <livewire:components.input-component idName="apellido" label="Apellido" />
-                    <livewire:components.input-component idName="rut" label="rut" placeholder='ingresa tu rut' />
+                    <livewire:components.input-component idName="rut" label="R.U.T." placeholder='ingresa tu rut' disabled="1" />
                 </div>
                 <livewire:components.input-component idName="edad" label="Edad" />
                 <button type="submit" class="rounded-lg border-2 m-auto">Submit</button>
