@@ -15,10 +15,10 @@
         dark:focus:ring-blue-500 dark:focus:border-blue-500"
         placeholder="{{ $placeholder }}">
     @if ($icon)
-        <div
-            class="flex items-center px-2 bg-gray-200 border border-l-2 border-gray-300 rounded-r-lg dark:bg-gray-600 dark:border-gray-600 w-10">
-            <livewire:components.icon-component :iconName="$icon" />
-        </div>
+        <button wire:click="changeIcon"
+            class="flex items-center px-2 bg-gray-200 border border-l-2 border-gray-300 rounded-r-lg dark:bg-gray-600 dark:border-gray-600 w-10 focus:outline-none">
+            <livewire:components.icon-component :iconName="{{ $icon[0] }}" />
+        </button>
     @endif
     @error($idName)
         <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
