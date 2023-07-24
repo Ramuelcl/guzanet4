@@ -13,14 +13,16 @@ class InputComponent extends Component
     public $labelTextAlign;
     public $placeholder;
     public $disabled;
+    public $icon;
 
-    public function mount($idName, $label = '', $placeholder = '', $disabled = 0, $labelTextAlign = 'right')
+    public function mount($idName, $label = '', $placeholder = '', $disabled = 0, $labelTextAlign = 'right', $opcion = 'password', $icon = '')
     {
         $this->idName = $idName;
         $this->label = $label;
+        $this->labelTextAlign = $labelTextAlign;
         $this->placeholder = $placeholder;
         $this->disabled = $disabled;
-        $this->labelTextAlign = $labelTextAlign;
+        $this->icon = $icon;
     }
 
     public function render()

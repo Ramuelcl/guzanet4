@@ -13,7 +13,7 @@
                     <livewire:components.input-component idName="apellido" label="Apellido" />
                     <livewire:components.input-component idName="rut" label="R.U.T." placeholder='ingresa tu rut' disabled="1" />
                 </div>
-                <livewire:components.input-component idName="edad" label="Edad" />
+                <livewire:components.input-component idName="edad" label="Edad" :icon="'eye'" />
                 <button type="submit" class="rounded-lg border-2 m-auto">Submit</button>
             </div>
         </form>
