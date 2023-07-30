@@ -154,5 +154,7 @@ return [
     */
 
     'render_on_redirect' => false,
-
+    'aliases' => [
+        'cliente-component' => \App\Http\Livewire\Backend\ClienteComponent::class,
+    ],
 ];

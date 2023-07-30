@@ -3,13 +3,16 @@
 use Illuminate\Support\Facades\Route;
 //
 use App\Http\Livewire\Component;
+use App\Http\Livewire\Backend\EntidadComponent;
 use App\Http\Controllers\PrincipalController;
 use App\Http\Controllers\backend\UserController;
 use App\Http\Controllers\ImportExportController;
+use App\Http\Livewire\Backend\ClienteComponent;
 
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/admin/clientes', ClienteComponent::class);
 
 // Livewire
 // Route::get('/register', function () {
@@ -28,7 +31,7 @@ Route::group(['prefix' => 'banca'], function () {
 
 // sistema tablas
 Route::group(['prefix' => 'admin'], function () {
-    Route::get('/livewire-entidades', [LivewireController::class, 'entidades'])->name('livewire.entidades');
+    Route::get('/entidades', EntidadComponent::class)->name('admin.entidades');
 });
 // -- define idioma --
 Route::get('/greeting/{locale}', function ($locale) {

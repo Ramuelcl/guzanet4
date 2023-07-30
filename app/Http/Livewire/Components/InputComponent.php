@@ -13,7 +13,7 @@ class InputComponent extends Component
     public $labelTextAlign;
     public $placeholder;
     public $disabled;
-    public $icon, $peuxChanger = false;
+    public $icon, $peuxChanger = false, $currentIconIndex = 0;
 
     public function mount($idName, $label = '', $placeholder = '', $disabled = 0, $labelTextAlign = 'left',  $icon = [], $opcion = 'password')
     {
@@ -41,12 +41,10 @@ class InputComponent extends Component
 
     public function changeIcon()
     {
-        // dd($this->icon, sizeof($this->icon));
         // Cambiar entre los dos estados de icono, así siempre mostraré $icon[0]
-        if (sizeof($this->icon) == 2) {
-            $this->icon = array_reverse($this->icon);
-            dd($this->icon[0]);
+        if ($this->peuxChanger) {
+            $this->currentIconIndex = 1 - $this->currentIconIndex;
+            dump($this->icon[$this->currentIconIndex]);
         }
-        $this->render();
     }
 }

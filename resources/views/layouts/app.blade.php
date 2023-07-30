@@ -19,6 +19,10 @@
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <wireui:scripts />
     <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.js"
+        integrity="sha384-uv6EdH4xg6h1Wk/gv6C0+NSrYgQ/6QpX/FoT/HNRZbjUpRCFXCF7mIPLpdn2P4lz" crossorigin="anonymous">
+    </script>
+
     <!-- Estilos comunes -->
     @livewireStyles
     @stack('styles')
@@ -251,7 +255,6 @@
 
         // }
     </script>
-
 </body>
 
 </html>
