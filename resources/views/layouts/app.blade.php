@@ -255,6 +255,12 @@
 
         // }
     </script>
+    <style>
+        th {
+            text-transform: none;
+        }
+    </style>
+
 </body>
 
 </html>

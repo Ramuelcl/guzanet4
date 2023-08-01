@@ -51,8 +51,8 @@ class Entidad extends Model
         return $this->morphTo(Tabla::class, 'tabla', 'tabla_id');
     }
 
-    public function scopeActive($query)
+    public function scopeIsActive($query)
     {
-        return $query->where('is_Active', 1);
+        return $query->where('is_active', true);
     }
 }

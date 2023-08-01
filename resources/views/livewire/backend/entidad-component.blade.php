@@ -19,19 +19,30 @@
                 </div>
 
                 <div class="w-full mt-4 md:w-auto">
-                    <button type="submit" class="btn btn-primary">
+                    <x-button type="submit" primary>
                         @if ($editing)
                             Guardar cambios
                         @else
                             Guardar
                         @endif
-                    </button>
+                    </x-button>
                 </div>
             </form>
         </x-card>
     @elseif ($frmFixeModal === 'Modal')
+        <!-- Ventana modal de ingreso/edicion -->
+        @if ($isModalOpen)
+            <div class="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-60">
+                <div class="bg-white p-4 rounded-md">
+                    <x-card>
+                        contenido
+                    </x-card>
+                </div>
+            </div>
+        @endif
+
         <!-- Mostrar el modal -->
-        <x-modal blur wire:model.defer="isModalOpen">
+        {{-- <x-modal blur wire:model.defer="isModalOpen">
             <x-slot name="title">
                 Editar Entidad
             </x-slot>
@@ -58,7 +69,7 @@
                 <button wire:click="closeModal" class="btn btn-secondary">Cerrar</button>
                 <button wire:click="update" class="btn btn-primary">Guardar cambios</button>
             </x-slot>
-        </x-modal>
+        </x-modal> --}}
     @endif
 
     <div class="py-2">
@@ -66,15 +77,16 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     {{-- Incluimos el componente TablaComponent --}}
-                    <livewire:components.tabla-component modelo="App\Models\Backend\Entidad" :columnas="[
-                        'id' => 'id',
-                        'razonSocial' => ['Razon Social'],
-                        'nombres' => ['Nombres'],
-                        'apellidos' => ['Apellidos'],
-                        'eMail' => ['Email'],
-                        'is_active' => ['Activo', 'boolean'],
-                    ]"
-                        :frmFixeModal="$frmFixeModal" :perPage="$perPage" />
+                    <livewire:components.tabla-component :data="$entidades" :columnas="[
+                        'id' => ['label' => 'Id', 'sortBy' => true, 'format' => 'integer'],
+                        'razonSocial' => ['label' => 'Razon Social', 'sortBy' => true],
+                        'nombres' => ['label' => 'Nombres', 'sortBy' => true],
+                        'apellidos' => ['label' => 'Apellidos', 'sortBy' => true],
+                        'eMail' => ['label' => 'Email'],
+                        'is_active' => ['label' => 'Activo', 'format' => 'boolean', 'sortBy' => true],
+                        'tipo' => ['label' => 'Tipo', 'hidden' => true],
+                    ]" :frmFixeModal="$frmFixeModal"
+                        :perPage="$perPage" :isActiveOnly="$isActiveOnly" />
                 </div>
             </div>
         </div>
@@ -86,7 +98,7 @@
                 @if (isset($header))
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-semibold">Título del Modal</h2>
-                        <button wire:click="closeModal" class="text-gray-500 focus:outline-none">
+                        <button wire:click="closeModal('confirmingDelete')" class="text-gray-500 focus:outline-none">
                             <x-icon name="x" class="w-4 h-4" />
                         </button>
                         <hr class="w-full border-t-4">
@@ -103,8 +115,8 @@
                 @else
                     <hr class="w-full border-t">
                     <div class="mt-4 flex justify-end">
-                        <button wire:click="closeModal" class="btn btn-secondary mr-2">Cancelar</button>
-                        <button class="btn btn-primary">Aceptar</button>
+                        <x-button wire:click="closeModal('confirmingDelete')" label="Cancelar" class="mr-2" />
+                        <x-button wire:click="delete" neutral label="Aceptar" />
                     </div>
                 @endif
             </div>

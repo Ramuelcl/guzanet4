@@ -17,6 +17,15 @@ class EntidadComponent extends Component
     public $tipo = 1;
     public $is_active = 1;
 
+    // Reglas de validación para los campos
+    protected $rules = [
+        'razonSocial' => 'max:128',
+        'nombres' => 'required|string|max:80',
+        'apellidos' => 'max:80',
+        'eMail' => 'required|email|unique:entidades,eMail|max:255', // Aquí usamos la regla unique para evitar duplicados en la base de datos
+        'tipo' => '', // Supongamos que el campo tipo solo puede ser 1, 2 o 3
+    ];
+
     public $selectedItem; // Variable para almacenar el registro seleccionado
     public $editing = false; // Variable para indicar si se está editando o creando un registro nuevo
     public $confirmingDelete = false;
@@ -25,13 +34,15 @@ class EntidadComponent extends Component
     public $frmFixeModal = 'Fixe'; // Variable para determinar el sistema de formulario fijo=false/modal=true
     public $isModalOpen = false; // Variable para controlar la apertura y cierre de la ventana modal
     public $perPage = 5; // Número de registros por página
+    public $search = '';
+    public $isActiveOnly = false;
 
-    protected $listeners = ['edit', 'OpenModal', 'changePerPage', 'confirmDelete'];
+    protected $listeners = ['edit', 'openModal', 'changePerPage', 'confirmDelete', 'searchApplied', 'activeApplied'];
 
     public function render()
     {
-        $entidades = Entidad::paginate($this->perPage);
-
+        $entidades = $this->getData(); //Entidad::paginate($this->perPage);
+        // dump(['entidades' => $entidades]);
         return view('livewire.backend.entidad-component', [
             'entidades' => $entidades,
         ]);
@@ -39,6 +50,9 @@ class EntidadComponent extends Component
 
     public function store()
     {
+        // Validamos los datos según las reglas definidas
+        $this->validate();
+
         if ($this->editing) {
             // Estamos editando un registro existente
             if ($this->selectedItem) {
@@ -65,7 +79,7 @@ class EntidadComponent extends Component
         }
 
         $this->resetInputs();
-        $this->emit("refreshList");
+        $this->emit('refreshList');
     }
 
     public function edit($id)
@@ -83,9 +97,9 @@ class EntidadComponent extends Component
             $this->is_active = $entidad->is_active;
 
             $this->editing = true; // Indicar que estamos editando un registro
-
-        } else
+        } else {
             dump('registro no encontrado');
+        }
     }
 
     public function update()
@@ -99,8 +113,7 @@ class EntidadComponent extends Component
                 'is_active' => $this->is_active,
             ]);
         }
-        $this->isModalOpen = false; // Agregamos esta línea para cerrar el modal
-
+        $this->closeModal(); // Agregamos esta línea para cerrar el modal
     }
 
     public function confirmDelete($id)
@@ -115,7 +128,6 @@ class EntidadComponent extends Component
         if ($entidad) {
             $entidad->delete();
             // Entidad::destroy($id);
-
         }
         $this->confirmingDelete = false;
         $this->deleteId = null;
@@ -134,28 +146,28 @@ class EntidadComponent extends Component
         $this->editing = false;
     }
 
-    // Método para cerrar el formulario en la misma lista y limpiar los campos
-    public function closeFormInList()
-    {
-        $this->selectedItem = null;
-        $this->resetInputs();
-    }
-
     // Método para abrir el modal y cargar los datos del registro seleccionado en el formulario
     public function openModal($id)
     {
-        dd("openModal");
-        $this->edit($id);
+        // dd("openModal");
+        if ($id === 0) {
+            // crear
+            $this->resetInputs();
+        } else {
+            //editar
+            $this->edit($id);
+        }
 
         $this->isModalOpen = true;
     }
-
     // Método para cerrar el modal y limpiar los campos del formulario
-    public function closeModal()
+    public function closeModal($modal)
     {
         $this->selectedItem = null;
-        $this->resetInputs();
-        $this->isModalOpen = false;
+        if ($this->editing) {
+            $this->resetInputs();
+        }
+        $this->$modal = false;
     }
 
     // Método para cambiar la cantidad de registros por página
@@ -163,5 +175,53 @@ class EntidadComponent extends Component
     {
         $this->perPage = $value;
         $this->resetPage(); // Reseteamos la página para evitar problemas de paginación
+    }
+    public function searchApplied($search)
+    {
+        // Aplicar los filtros recibidos del evento
+        $this->search = $search;
+
+        // Reiniciar la paginación a la primera página al aplicar nuevos filtros
+        $this->resetPage();
+    }
+
+    public function activeApplied()
+    {
+        // Aplicar los filtros recibidos del evento
+        $this->isActiveOnly = !$this->isActiveOnly;
+
+        // Reiniciar la paginación a la primera página al aplicar nuevos filtros
+        $this->resetPage();
+    }
+
+    public function getData()
+    {
+        // Consulta base para obtener los registros de la entidad
+        $query = Entidad::query();
+
+        // Aplicar filtro de búsqueda si hay texto en el campo de búsqueda
+        if (!empty($this->search)) {
+            $query->where(function (Builder $q) {
+                // Asegurar que $q sea una instancia de Builder
+                $q->where('razonSocial', 'like', '%' . $this->search . '%')
+                    ->orWhere('nombres', 'like', '%' . $this->search . '%')
+                    ->orWhere('apellidos', 'like', '%' . $this->search . '%')
+                    ->orWhere('eMail', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        // Aplicar filtro de is_active para ver solo los registros activos utilizando el scope
+        // solo si $this->isActiveOnly es true
+        if ($this->isActiveOnly) {
+            $query->isActive();
+        }
+
+        // Ordenar por columna y dirección en caso de haber aplicado un ordenamiento
+        if (!empty($this->sortBy) && !empty($this->sortDirection)) {
+            $query->orderBy($this->sortBy, $this->sortDirection);
+        }
+
+        // Retorna la consulta para que se puedan encadenar otros métodos
+        return $query;
     }
 }
