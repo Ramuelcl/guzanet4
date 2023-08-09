@@ -40,7 +40,7 @@
         html,
         body {
             height: 100%;
-            overflow-y: hidden;
+            /* overflow-y: hidden; */
         }
 
         header {
@@ -82,45 +82,41 @@
     <header class="fixed-top bg-green-200 h-20 w-full flex justify-between px-2 text-g items-center">
         <!-- Primera columna: Icono para mostrar/ocultar el sidebar -->
         <div class="flex-col p-2">
+            <x-icon name="moon" class="w-5 h-5" />
+            <x-icon name="sun" class="w-5 h-5" />
+
             <!-- Icono para mostrar/ocultar el sidebar -->
-            <x-icon name="home" class="w-5 h-5" />
+            <x-icon name="dots-horizontal" class="w-5 h-5" />
+            <x-icon name="dots-vertical" class="w-5 h-5" />
 
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-            </svg>
-
-            <div class="icon p-2">
-                <!-- Icono para cambiar entre light y dark mode -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18">
-                    </path>
-                </svg>
-            </div>
         </div>
 
         <!-- Segunda columna: Logotipo -->
         <div class="flex-1">LOGO</div>
 
-        <!-- Tercera columna: Espacio en blanco -->
-        <div class="flex-1">Titulo</div>
+        <!-- Tercera columna: Titulo -->
+        <div class="flex-1">Titulo del sistema</div>
 
         <!-- Cuarta columna: Otros elementos del encabezado -->
-        <div>Elementos aquí</div>
+        <div> <x-button flat icon="menu" label="Usuario" /></div>
     </header>
     <main>
         <div class="flex mx-4">
-            <div class="w-1/5 bg-gray-300 p-4">
-                <!-- Barra lateral (Sidebar) -->
+            <div class="w-1/5 bg-gray-300 p-4 ">
                 <!-- Contenido de la barra lateral -->
-                <a href="#">Opcion 1</a>
-                <a href="#">Opcion 2</a>
-                <a href="#">Opcion 3</a>
+                <aside>
+                    <ul class="flex-wrap">
+                        <x-button flat icon="flag" label="Idioma" />
+                        <x-button flat label="opcion 2" />
+                        <x-button flat label="opcion 3" />
+                    </ul>
+                </aside>
             </div>
-            <div class="w-4/5 bg-gray-300 p-4 ml-4">
+            <div class="w-full bg-gray-300 p-4 ml-4">
                 <!-- Contenido principal -->
                 <!-- Page Heading -->
                 <x-slot name="sub-header">
-                    <div class="bg-gray-100 dark:bg-gray-900 shadow-lg">
+                    <div class="bg-gray-100 dark:bg-gray-900 shadow-lg w-full text-gray-800">
                         <div class="text-gray-800 dark:text-gray-50 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-50 leading-tight">
                                 sub titulo por defecto
@@ -129,9 +125,6 @@
                     </div>
                 </x-slot>
 
-                <x-slot name="sub-header">
-                    <h2 class="w-full">Este es el sub-encabezado del componente layout01</h2>
-                </x-slot>
                 {{ $slot ?? 'slot por defecto en layout01' }}
             </div>
         </div>
