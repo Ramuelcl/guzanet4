@@ -10,9 +10,9 @@ use App\Http\Controllers\ImportExportController;
 use App\Http\Livewire\Backend\ClienteComponent;
 
 // Ruta principal que carga la vista 'welcome' usando la plantilla 'apps'
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/admin/clientes', ClienteComponent::class);
 

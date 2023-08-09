@@ -1,5 +1,5 @@
-{{-- resources/views/components/principal/acercade.blade.php --}}
-<x-app-layout>
+<x-layouts.layout01 titulo="- welcome">
+    {{-- resources/views/components/principal/acercade.blade.php --}}
     <x-slot name="header">
         {{ __('Acerca de') }}
     </x-slot>
@@ -218,4 +218,4 @@
             </div>
         </form>
     </div>
-</x-app-layout>
+    </x-app-layout>

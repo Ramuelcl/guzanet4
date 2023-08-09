@@ -79,8 +79,33 @@
 </head>
 
 <body class="antialiased bg-gray-50">
-    <header>
-        ENCABEZADO
+    <header class="fixed-top bg-green-200 h-20 w-full flex justify-between px-2 text-g items-center">
+        <!-- Primera columna: Icono para mostrar/ocultar el sidebar -->
+        <div class="flex-col p-2">
+            <!-- Icono para mostrar/ocultar el sidebar -->
+            <x-icon name="home" class="w-5 h-5" />
+
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+
+            <div class="icon p-2">
+                <!-- Icono para cambiar entre light y dark mode -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18">
+                    </path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Segunda columna: Logotipo -->
+        <div class="flex-1">LOGO</div>
+
+        <!-- Tercera columna: Espacio en blanco -->
+        <div class="flex-1">Titulo</div>
+
+        <!-- Cuarta columna: Otros elementos del encabezado -->
+        <div>Elementos aquí</div>
     </header>
     <main>
         <div class="flex mx-4">
@@ -93,7 +118,17 @@
             </div>
             <div class="w-4/5 bg-gray-300 p-4 ml-4">
                 <!-- Contenido principal -->
-                <!-- Aquí se mostrarán los menús y su contenido -->
+                <!-- Page Heading -->
+                <x-slot name="sub-header">
+                    <div class="bg-gray-100 dark:bg-gray-900 shadow-lg">
+                        <div class="text-gray-800 dark:text-gray-50 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-50 leading-tight">
+                                sub titulo por defecto
+                            </h2>
+                        </div>
+                    </div>
+                </x-slot>
+
                 <x-slot name="sub-header">
                     <h2 class="w-full">Este es el sub-encabezado del componente layout01</h2>
                 </x-slot>
