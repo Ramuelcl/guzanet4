@@ -10,7 +10,7 @@ class TablaComponent extends Component
 {
     use WithPagination;
 
-    protected $data; // Variable para almacenar el nombre del modelo a consultar
+    public $data; // Variable para almacenar el nombre del modelo a consultar
     public $columnas; // Variable para almacenar las columnas de la tabla
     public $sortBy = 'id'; // Columna por defecto para el ordenamiento
     public $sortDirection = 'asc'; // Sentido del orden por defecto
@@ -26,10 +26,6 @@ class TablaComponent extends Component
     {
         $this->data = $data;
         $this->columnas = $this->processColumns($columnas);
-        if ($perPage !== $this->perPage) {
-            $this->perPage = $perPage;
-            $this->resetPage();
-        }
     }
 
     public function render()
@@ -67,10 +63,40 @@ class TablaComponent extends Component
         });
     }
 
-    public function changePerPage($value)
+    public function sortBy($field)
     {
-        // dd($value);
-        $this->perPage = $value;
-        $this->emit('changePerPage', $value);
+        // dd($field);
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->emit('sortBy', [$this->sortBy, $this->sortDirection]);
+    }
+
+    // Método para manejar el clic en una fila
+    public function selectItem($id)
+    {
+        if (!is_null($id)) {
+            if ($this->frmFixeModal === "Fixe") {
+                $this->emit('edit', $id);
+            }
+        }
+    }
+
+    public function confirmDelete($id)
+    {
+        $this->emitUp('confirmDelete', $id);
+    }
+
+    public function newEdit($id)
+    {
+        $this->emitUp('openModal', $id);
+    }
+
+    public function activeApplied()
+    {
+        $this->emitUp('activeApplied');
     }
 }

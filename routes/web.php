@@ -9,9 +9,11 @@ use App\Http\Controllers\backend\UserController;
 use App\Http\Controllers\ImportExportController;
 use App\Http\Livewire\Backend\ClienteComponent;
 
+// Ruta principal que carga la vista 'welcome' usando la plantilla 'apps'
 Route::get('/', function () {
     return view('welcome');
 });
+
 Route::get('/admin/clientes', ClienteComponent::class);
 
 // Livewire
@@ -32,6 +34,8 @@ Route::group(['prefix' => 'banca'], function () {
 // sistema tablas
 Route::group(['prefix' => 'admin'], function () {
     Route::get('/entidades', EntidadComponent::class)->name('admin.entidades');
+    Route::get('/entidad/edit', EntidadComponent::class)->name('admin.entidad.edit');
+    Route::get('/entidad/destroy', EntidadComponent::class)->name('admin.entidad.destroy');
 });
 // -- define idioma --
 Route::get('/greeting/{locale}', function ($locale) {

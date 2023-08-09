@@ -33,165 +33,36 @@ class EntidadComponent extends Component
 
     public $frmFixeModal = 'Fixe'; // Variable para determinar el sistema de formulario fijo=false/modal=true
     public $isModalOpen = false; // Variable para controlar la apertura y cierre de la ventana modal
-    public $perPage = 5; // Número de registros por página
+
+    public $perPage = 5;
     public $search = '';
     public $isActiveOnly = false;
+    public $sortBy = 'id'; // Columna por defecto para el ordenamiento
+    public $sortDirection = 'asc'; // Sentido del orden por defecto
 
-    protected $listeners = ['edit', 'openModal', 'changePerPage', 'confirmDelete', 'searchApplied', 'activeApplied'];
+    protected $listeners = ['changePerPage', 'sortBy', 'edit', 'openModal', 'confirmDelete', 'searchApplied', 'activeApplied'];
 
     public function render()
     {
-        $entidades = $this->getData(); //Entidad::paginate($this->perPage);
+        $entidades = $this->getData();
         // dump(['entidades' => $entidades]);
         return view('livewire.backend.entidad-component', [
             'entidades' => $entidades,
         ]);
     }
 
-    public function store()
-    {
-        // Validamos los datos según las reglas definidas
-        $this->validate();
-
-        if ($this->editing) {
-            // Estamos editando un registro existente
-            if ($this->selectedItem) {
-                $this->selectedItem->update([
-                    'razonSocial' => $this->razonSocial,
-                    'nombres' => $this->nombres,
-                    'apellidos' => $this->apellidos,
-                    'eMail' => $this->eMail,
-                    'is_active' => $this->is_active,
-                    // Otros campos si los hubiera...
-                ]);
-            }
-            $this->editing = false; // Resetear la propiedad $editing después de editar
-        } else {
-            // Estamos creando un nuevo registro
-            Entidad::create([
-                'razonSocial' => $this->razonSocial,
-                'nombres' => $this->nombres,
-                'apellidos' => $this->apellidos,
-                'eMail' => $this->eMail,
-                'is_active' => $this->is_active,
-                'tipo' => $this->tipo,
-            ]);
-        }
-
-        $this->resetInputs();
-        $this->emit('refreshList');
-    }
-
-    public function edit($id)
-    {
-        // dd($id);
-        // Método para editar una entidad
-        $entidad = Entidad::find($id);
-        if ($entidad) {
-            // dd($entidad);
-            $this->selectedItem = $entidad;
-            $this->razonSocial = $entidad->razonSocial;
-            $this->nombres = $entidad->nombres;
-            $this->apellidos = $entidad->apellidos;
-            $this->eMail = $entidad->eMail;
-            $this->is_active = $entidad->is_active;
-
-            $this->editing = true; // Indicar que estamos editando un registro
-        } else {
-            dump('registro no encontrado');
-        }
-    }
-
-    public function update()
-    {
-        if ($this->selectedItem) {
-            $this->selectedItem->update([
-                'razonSocial' => $this->razonSocial,
-                'nombres' => $this->nombres,
-                'apellidos' => $this->apellidos,
-                'eMail' => $this->eMail,
-                'is_active' => $this->is_active,
-            ]);
-        }
-        $this->closeModal(); // Agregamos esta línea para cerrar el modal
-    }
-
-    public function confirmDelete($id)
-    {
-        $this->confirmingDelete = true;
-        $this->deleteId = $id;
-    }
-
-    public function delete()
-    {
-        $entidad = Entidad::find($this->deleteId);
-        if ($entidad) {
-            $entidad->delete();
-            // Entidad::destroy($id);
-        }
-        $this->confirmingDelete = false;
-        $this->deleteId = null;
-        $this->resetInputs();
-        $this->emit('refreshList');
-    }
-
-    private function resetInputs()
-    {
-        $this->razonSocial = null;
-        $this->nombres = null;
-        $this->apellidos = null;
-        $this->eMail = null;
-        $this->tipo = 1;
-
-        $this->editing = false;
-    }
-
-    // Método para abrir el modal y cargar los datos del registro seleccionado en el formulario
-    public function openModal($id)
-    {
-        // dd("openModal");
-        if ($id === 0) {
-            // crear
-            $this->resetInputs();
-        } else {
-            //editar
-            $this->edit($id);
-        }
-
-        $this->isModalOpen = true;
-    }
-    // Método para cerrar el modal y limpiar los campos del formulario
-    public function closeModal($modal)
-    {
-        $this->selectedItem = null;
-        if ($this->editing) {
-            $this->resetInputs();
-        }
-        $this->$modal = false;
-    }
-
-    // Método para cambiar la cantidad de registros por página
+    // Método para cambiar el valor de $perPage
     public function changePerPage($value)
     {
+        // dd($value);
         $this->perPage = $value;
-        $this->resetPage(); // Reseteamos la página para evitar problemas de paginación
-    }
-    public function searchApplied($search)
-    {
-        // Aplicar los filtros recibidos del evento
-        $this->search = $search;
-
-        // Reiniciar la paginación a la primera página al aplicar nuevos filtros
-        $this->resetPage();
+        $this->render(); // Volver a obtener los datos con la nueva paginación
     }
 
-    public function activeApplied()
+    public function sortBy($params)
     {
-        // Aplicar los filtros recibidos del evento
-        $this->isActiveOnly = !$this->isActiveOnly;
-
-        // Reiniciar la paginación a la primera página al aplicar nuevos filtros
-        $this->resetPage();
+        $this->sortBy = $params[0];
+        $this->sortDirection = $params[1];
     }
 
     public function getData()
@@ -201,7 +72,8 @@ class EntidadComponent extends Component
 
         // Aplicar filtro de búsqueda si hay texto en el campo de búsqueda
         if (!empty($this->search)) {
-            $query->where(function (Builder $q) {
+            $query->where(function ($q) {
+                //function (Builder $q)
                 // Asegurar que $q sea una instancia de Builder
                 $q->where('razonSocial', 'like', '%' . $this->search . '%')
                     ->orWhere('nombres', 'like', '%' . $this->search . '%')
@@ -222,6 +94,7 @@ class EntidadComponent extends Component
         }
 
         // Retorna la consulta para que se puedan encadenar otros métodos
-        return $query;
+        // Devolver la consulta paginada
+        return $query->paginate($this->perPage);
     }
 }

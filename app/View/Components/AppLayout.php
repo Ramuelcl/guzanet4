@@ -12,6 +12,7 @@ class AppLayout extends Component
      */
     public function render(): View
     {
-        return view('layouts.app');
+        return view('components.layouts.layout01');
     }
 }
+// programa principal para cargar las vistas, no logro encontrar quién lo carga primero
