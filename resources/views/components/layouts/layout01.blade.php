@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 
 <head>
     <meta charset="utf-8">
@@ -13,82 +13,26 @@
     <wireui:scripts />
     <script src="//unpkg.com/alpinejs" defer></script>
     <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/custom-styles.css', 'resources/js/app.js', 'resources/js/mode-dark.js', 'resources/js/mode-sideBar.js'])
+    @livewireStyles
+    @stack('styles')
 
-    <style>
-        [x-cloak] {
-            display: none;
-        }
-
-        :root {
-            --exito: #3ab65c;
-            --error: #bf333b;
-            --info: #1898c0;
-            --warning: #bc8c12;
-            --exito-hover: #2d8a46;
-            --error-hover: #962a31;
-            --info-hover: #147fa0;
-            --warning-hover: #9b7512;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            height: 100%;
-            /* overflow-y: hidden; */
-        }
-
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-
-            background-color: greenyellow;
-            height: 100px;
-            width: 100%;
-        }
-
-        main {
-            margin-top: 120px;
-            /* Altura del encabezado + margen */
-            overflow-y: auto;
-        }
-
-        footer {
-            position: fixed;
-            /* Cambio a position: fixed; */
-            bottom: 0;
-            background-color: greenyellow;
-            height: 20px;
-            width: 100%;
-            margin-top: 120px;
-            /* Altura del encabezado + margen */
-
-            /* position: sticky;
-            bottom: 0;
-            background-color: greenyellow;
-            height: 20px;
-            width: 100%; */
-        }
-    </style>
 </head>
 
-<body class="antialiased bg-gray-50">
+<body class="antialiased w-screen h-screen flex-col bg-slate-100 dark:bg-slate-800">
     <header class="fixed-top bg-green-200 h-20 w-full flex justify-between px-2 text-g items-center">
-        <!-- Primera columna: Icono para mostrar/ocultar el sidebar -->
+        <!-- Primera columna: Icono para cambiar entre Dark/Light -->
         <div class="flex-col p-2">
-            <x-icon name="moon" class="w-5 h-5" />
-            <x-icon name="sun" class="w-5 h-5" />
+            <div class="cursor-pointer switchDark mb-4">
+                <x-icon name="moon" class="moon" />
+                <x-icon name="sun" class="sun hidden" />
+            </div>
 
             <!-- Icono para mostrar/ocultar el sidebar -->
-            <x-icon name="dots-horizontal" class="w-5 h-5" />
-            <x-icon name="dots-vertical" class="w-5 h-5" />
-
+            <div class="cursor-pointer switchSideBar">
+                <x-icon name="dots-horizontal" class="w-5 h-5" />
+                <x-icon name="dots-vertical" class="w-5 h-5 hidden" />
+            </div>
         </div>
 
         <!-- Segunda columna: Logotipo -->
@@ -130,6 +74,9 @@
         </div>
     </main>
     <footer></footer>
+    @livewireScripts
+    @stack('scripts')
+
 </body>
 
 </html>

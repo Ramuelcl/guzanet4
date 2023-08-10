@@ -1,26 +1,60 @@
 /* custom-styles.css */
-
-.submenu {
-    background-color: #f7f7f7;
-    padding: 1rem;
-    border: 1px solid #ccc;
+[x-cloak] {
+    display: none;
 }
 
-.menu-selected {
-    background-color: #3119cc;
-    color: #000;
-    /* Agrega cualquier otro estilo que desees para el menú seleccionado */
+:root {
+    --exito: #3ab65c;
+    --error: #bf333b;
+    --info: #1898c0;
+    --warning: #bc8c12;
+    --exito-hover: #2d8a46;
+    --error-hover: #962a31;
+    --info-hover: #147fa0;
+    --warning-hover: #9b7512;
 }
 
-.menu-selected a {
-    /* Estilos para los enlaces dentro del menú seleccionado */
-    color: #a14646;
-    /* Agrega cualquier otro estilo que desees para los enlaces */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Estilos CSS adicionales para la línea */
-.menu-line {
-    height: 2px;
-    background-color: blue;
-    display: block;
+html,
+body {
+    height: 100%;
+    /* overflow-y: hidden; */
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    background-color: greenyellow;
+    height: 100px;
+    width: 100%;
+}
+
+main {
+    margin-top: 120px;
+    /* Altura del encabezado + margen */
+    overflow-y: auto;
+}
+
+footer {
+    position: fixed;
+    /* Cambio a position: fixed; */
+    bottom: 0;
+    background-color: greenyellow;
+    height: 20px;
+    width: 100%;
+    margin-top: 120px;
+    /* Altura del encabezado + margen */
+
+    /* position: sticky;
+                bottom: 0;
+                background-color: greenyellow;
+                height: 20px;
+                width: 100%; */
 }

@@ -128,7 +128,7 @@ const agregarToast = ({ tipo, titulo, descripcion, autoCierre }) => {
 };
 
 // Dark
-const btnSwitch = document.querySelector('#switch');
+const btnSwitch = document.querySelector('#toggleDarkMode');
 
 btnSwitch.addEventListener('click', () => {
     document.body.classList.toggle('dark');
@@ -151,3 +151,5 @@ if (localStorage.getItem('dark-Mode') === 'true') {
     btnSwitch.classList.remove('active');
 
 }
+
+
