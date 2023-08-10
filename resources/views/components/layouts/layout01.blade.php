@@ -13,7 +13,8 @@
     <wireui:scripts />
     <script src="//unpkg.com/alpinejs" defer></script>
     <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/css/custom-styles.css', 'resources/js/app.js', 'resources/js/mode-dark.js', 'resources/js/mode-sideBar.js'])
+    @vite(['resources/css/app.css', 'resources/css/custom-styles.css', 'resources/js/app.js'])
+    {{-- , 'resources/js/mode-dark.js', 'resources/js/mode-sideBar.js' --}}
     @livewireStyles
     @stack('styles')
 
@@ -24,14 +25,14 @@
         <!-- Primera columna: Icono para cambiar entre Dark/Light -->
         <div class="flex-col p-2">
             <div class="cursor-pointer switchDark mb-4">
-                <x-icon name="moon" class="moon" />
-                <x-icon name="sun" class="sun hidden" />
+                <x-icon name="moon" class="w-5 h-5 moon" />
+                <x-icon name="sun" class="w-5 h-5 sun hidden" />
             </div>
 
             <!-- Icono para mostrar/ocultar el sidebar -->
             <div class="cursor-pointer switchSideBar">
-                <x-icon name="dots-horizontal" class="w-5 h-5" />
-                <x-icon name="dots-vertical" class="w-5 h-5 hidden" />
+                <x-icon name="dots-horizontal" class="w-5 h-5 dots-horizontal" />
+                <x-icon name="dots-vertical" class="w-5 h-5 dots-vertical hidden" />
             </div>
         </div>
 
@@ -46,7 +47,7 @@
     </header>
     <main>
         <div class="flex mx-4">
-            <div class="w-1/5 bg-gray-300 p-4 ">
+            <div class="w-1/5 bg-gray-300 p-4 sidebar">
                 <!-- Contenido de la barra lateral -->
                 <aside>
                     <ul class="flex-wrap">
@@ -56,7 +57,7 @@
                     </ul>
                 </aside>
             </div>
-            <div class="w-full bg-gray-300 p-4 ml-4">
+            <div class="w-full bg-gray-300 p-4 ml-4 main-content">
                 <!-- Contenido principal -->
                 <!-- Page Heading -->
                 <x-slot name="sub-header">
