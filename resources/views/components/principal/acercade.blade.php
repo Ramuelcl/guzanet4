@@ -1,6 +1,6 @@
-<x-layouts.layout01 titulo="- welcome">
+<x-layouts.layout01 titulo="- Acerca de">
     {{-- resources/views/components/principal/acercade.blade.php --}}
-    <x-slot name="header">
+    <x-slot name="sub-header">
         {{ __('Acerca de') }}
     </x-slot>
     <div class="mx-auto py-12">

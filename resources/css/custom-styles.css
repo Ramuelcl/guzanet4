@@ -1,4 +1,5 @@
 /* custom-styles.css */
+
 [x-cloak] {
     display: none;
 }
@@ -31,7 +32,7 @@ header {
     top: 0;
     left: 0;
 
-    background-color: greenyellow;
+    /* background-color: greenyellow; */
     height: 100px;
     width: 100%;
 }
@@ -46,7 +47,7 @@ footer {
     position: fixed;
     /* Cambio a position: fixed; */
     bottom: 0;
-    background-color: greenyellow;
+    /* background-color: greenyellow; */
     height: 20px;
     width: 100%;
     margin-top: 120px;

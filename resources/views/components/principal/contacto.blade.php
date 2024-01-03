@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layouts.layout01 titulo="- Contactez nous">
     <x-slot name="header">
         {{ __('Contactez nous') }}
     </x-slot>
@@ -43,4 +43,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-layouts.layout01>

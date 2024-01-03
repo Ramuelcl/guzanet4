@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Schema;
 //
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
 // use Maatwebsite\Excel\Concerns\WithMapping;
 // use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;

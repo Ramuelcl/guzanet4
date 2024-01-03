@@ -14,56 +14,66 @@
     <script src="//unpkg.com/alpinejs" defer></script>
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/css/custom-styles.css', 'resources/js/app.js'])
-    {{-- , 'resources/js/mode-dark.js', 'resources/js/mode-sideBar.js' --}}
+
     @livewireStyles
     @stack('styles')
 
 </head>
 
-<body class="antialiased w-screen h-screen flex-col bg-slate-100 dark:bg-slate-800">
-    <header class="fixed-top bg-green-200 h-20 w-full flex justify-between px-2 text-g items-center">
+<body class="antialiased w-screen h-screen flex-col bg-white text-black dark:bg-black dark:text-white">
+    <header class="fixed-top h-20 w-full flex justify-between px-2 items-center shadow-lg dark:shadow-white">
         <!-- Primera columna: Icono para cambiar entre Dark/Light -->
-        <div class="flex-col p-2">
-            <div class="cursor-pointer switchDark mb-4">
-                <x-icon name="moon" class="w-5 h-5 moon" />
-                <x-icon name="sun" class="w-5 h-5 sun hidden" />
-            </div>
-
-            <!-- Icono para mostrar/ocultar el sidebar -->
-            <div class="cursor-pointer switchSideBar">
-                <x-icon name="dots-horizontal" class="w-5 h-5 dots-horizontal" />
-                <x-icon name="dots-vertical" class="w-5 h-5 dots-vertical hidden" />
-            </div>
-        </div>
+        @include('components.layouts.parts.Dark_SideBar')
 
         <!-- Segunda columna: Logotipo -->
-        <div class="flex-1">LOGO</div>
+        <div class="flex-1">
+            <img src="{{ asset(config('app_settings.logo')) }}" alt="Logo" class="h-20 w-auto">
+        </div>
 
-        <!-- Tercera columna: Titulo -->
-        <div class="flex-1">Titulo del sistema</div>
+        <!-- Tercera columna: Titulo y menu principal -->
+        <div class="flex-wrap items-center text-start">
+            <!-- Título -->
+            <div class="text-2xl font-bold mx-auto">
+                {{ config('app_settings.titulo', 'Titulo del sistema') }}
+            </div>
+
+            <!-- Menú -->
+            <x-navigation-menu class="" />
+        </div>
 
         <!-- Cuarta columna: Otros elementos del encabezado -->
-        <div> <x-button flat icon="menu" label="Usuario" /></div>
+        <div>
+            <x-dropdown>
+                <x-dropdown.header label="Configuración">
+                    <x-dropdown.item icon="cog" label="Preferencias" />
+                    <x-dropdown.item icon="user" label="Perfil" />
+                </x-dropdown.header>
+
+                <x-dropdown.item separator label="Registrarse" href="{{ route('register') }}" @click="open = false" />
+                <x-dropdown.item label="Salir" />
+                <x-dropdown.item separator label="Luna/Sol" />
+            </x-dropdown>
+        </div>
     </header>
     <main>
-        <div class="flex mx-4">
-            <div class="w-1/5 bg-gray-300 p-4 sidebar">
+        <div class="flex mt-4">
+            <aside class="w-[200px] sidebar rounded-md">
                 <!-- Contenido de la barra lateral -->
-                <aside>
-                    <ul class="flex-wrap">
-                        <x-button flat icon="flag" label="Idioma" />
-                        <x-button flat label="opcion 2" />
-                        <x-button flat label="opcion 3" />
-                    </ul>
-                </aside>
-            </div>
-            <div class="w-full bg-gray-300 p-4 ml-4 main-content">
+                <ul class="flex-wrap">
+                    <x-button flat icon="flag" label="Idioma" />
+                    <x-button flat label="opcion 2" />
+                    <x-button flat label="opcion 3" />
+                </ul>
+            </aside>
+            {{-- espacio de separacion --}}
+            <div class="mx-2"></div>
+            <div class="w-full main-content rounded-md">
                 <!-- Contenido principal -->
                 <!-- Page Heading -->
                 <x-slot name="sub-header">
-                    <div class="bg-gray-100 dark:bg-gray-900 shadow-lg w-full text-gray-800">
-                        <div class="text-gray-800 dark:text-gray-50 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-50 leading-tight">
+                    <div class="shadow-lg w-full">
+                        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                            <h2 class="font-semibold text-xl leading-tight">
                                 sub titulo por defecto
                             </h2>
                         </div>

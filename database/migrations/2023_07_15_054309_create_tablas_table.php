@@ -12,6 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::create($this->table, function (Blueprint $table) {
             $table->bigInteger('tabla');
             $table->bigInteger('tabla_id');
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -33,6 +35,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists($this->table);
+        Schema::enableForeignKeyConstraints();
     }
 };

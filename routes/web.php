@@ -16,10 +16,6 @@ use App\Http\Livewire\Backend\ClienteComponent;
 
 Route::get('/admin/clientes', ClienteComponent::class);
 
-// Livewire
-// Route::get('/register', function () {
-//     return view('register');
-// });
 Route::get('/register', \App\Http\Livewire\register::class);
 // Route::get('/register', \App\Http\Livewire\register::class)->layout('layouts.base');
 
